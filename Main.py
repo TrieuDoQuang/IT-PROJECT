@@ -17,7 +17,7 @@ class Game:
                 self.state = res
             self.Butt_Play.render(display)
             self.Butt_Exit.render(display)
-            
+
         elif self.state == "Play":
             display.fill('yellow')
 
@@ -27,7 +27,7 @@ class Game:
 
 if __name__ == '__main__':
     pygame.init()
-    screen_w = 960
+    screen_w = 900
     screen_h = 540
     screen = pygame.display.set_mode((screen_w, screen_h))
     display = pygame.surface.Surface((screen_w, screen_h))
