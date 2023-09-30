@@ -1,7 +1,7 @@
 import pygame
 import os
 
-Base_IMG_PATH = 'Data/Assets'
+Base_IMG_PATH = 'Data/Assets/'
 
 def Load_IMG(path):
     img = pygame.image.load(Base_IMG_PATH + path).convert()
@@ -24,6 +24,8 @@ def Sprite_sheet_IMGS(path, pos, width, height, offset, frames):
         images.append(surf)
     return images
     
+
+
 class Animation():
     def __init__(self, imgs,  dur = 5, loop = True):
         self.imgs = imgs
