@@ -1,5 +1,6 @@
 import pygame, sys
 from Scripts.Buttons import Button
+from Scripts.Clouds import Clouds
 from Scripts.Assets import *
 from Scripts.Tilemap import Tilemap
 
@@ -8,6 +9,7 @@ class Game:
         self.assets = Assets
         self.state = "Main_Menu"
         self.block_size = 32
+        self.Clouds = Clouds(self.assets['Clouds'])
         self.Butt_Play = Button((screen_w/2 - 100, 250), (200, 50), 'red', 'Play', 'Play', text_color='white' ,text_size= 35)
         self.Butt_Exit = Button((screen_w/2 - 100, 320), (200, 50), 'red', 'Quit', 'Quit', text_color='white' ,text_size= 35)
         self.tilemap = Tilemap(self, tile_size = 32)
@@ -24,7 +26,11 @@ class Game:
 
         elif self.state == "Play":
             display.fill('yellow')
+            render_scroll = (0,0)
+            self.Clouds.render(display, offset= render_scroll)
+            self.Clouds.update()
             self.tilemap.render(display)
+
         elif self.state == "Quit":
             pygame.quit()
             sys.exit()
