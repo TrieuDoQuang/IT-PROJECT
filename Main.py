@@ -28,7 +28,7 @@ class Game:
 if __name__ == '__main__':
     pygame.init()
     screen_w = 900
-    screen_h = 540
+    screen_h = 400
     screen = pygame.display.set_mode((screen_w, screen_h))
     display = pygame.surface.Surface((screen_w, screen_h))
     clock = pygame.time.Clock()
