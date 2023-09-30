@@ -17,8 +17,10 @@ class Game:
                 self.state = res
             self.Butt_Play.render(display)
             self.Butt_Exit.render(display)
+            
         elif self.state == "Play":
-            screen.fill('yellow')
+            display.fill('yellow')
+
         elif self.state == "Quit":
             pygame.quit()
             sys.exit()
