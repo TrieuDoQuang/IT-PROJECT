@@ -1,6 +1,7 @@
 import pygame, sys
 from Scripts.Buttons import Button
 from Scripts.Assets import *
+from Scripts.Tilemap import Tilemap
 
 class Game:
     def __init__(self):
@@ -9,7 +10,7 @@ class Game:
         self.block_size = 32
         self.Butt_Play = Button((screen_w/2 - 100, 250), (200, 50), 'red', 'Play', 'Play', text_color='white' ,text_size= 35)
         self.Butt_Exit = Button((screen_w/2 - 100, 320), (200, 50), 'red', 'Quit', 'Quit', text_color='white' ,text_size= 35)
-    
+        self.tilemap = Tilemap(self, tile_size = 32)
     def run(self):
         if self.state == "Main_Menu":
             res = self.Butt_Play.update()
@@ -23,7 +24,7 @@ class Game:
 
         elif self.state == "Play":
             display.fill('yellow')
-
+            self.tilemap.render(display)
         elif self.state == "Quit":
             pygame.quit()
             sys.exit()

@@ -1,7 +1,7 @@
 import pygame
 import os
 
-Base_IMG_PATH = 'Data/Assets'
+Base_IMG_PATH = 'Data/Assets/'
 
 def Load_IMG(path):
     img = pygame.image.load(Base_IMG_PATH + path).convert()
