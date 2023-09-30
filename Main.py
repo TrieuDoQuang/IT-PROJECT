@@ -1,8 +1,10 @@
 import pygame, sys
 from Scripts.Buttons import Button
+from Scripts.Assets import *
 
 class Game:
     def __init__(self):
+        self.assets = Assets
         self.state = "Main_Menu"
         self.block_size = 32
         self.Butt_Play = Button((screen_w/2 - 100, 250), (200, 50), 'red', 'Play', 'Play', text_color='white' ,text_size= 35)
