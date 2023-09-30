@@ -1,6 +1,7 @@
 import pygame, sys
 from Scripts.Buttons import Button
 from Scripts.Clouds import Clouds
+from Scripts.Player import Player
 from Scripts.Assets import *
 from Scripts.Tilemap import Tilemap
 
@@ -9,7 +10,8 @@ class Game:
         self.assets = Assets
         self.state = "Main_Menu"
         self.block_size = 32
-        self.Clouds = Clouds(self.assets['Clouds'])
+        self.Clouds = Clouds(self.assets['Clouds'], size=(100, 50))
+        self.Player = Player('Player', (100, 100), (32, 32), self.assets)
         self.Butt_Play = Button((screen_w/2 - 100, 250), (200, 50), 'red', 'Play', 'Play', text_color='white' ,text_size= 35)
         self.Butt_Exit = Button((screen_w/2 - 100, 320), (200, 50), 'red', 'Quit', 'Quit', text_color='white' ,text_size= 35)
         self.tilemap = Tilemap(self, tile_size = 32)
@@ -30,6 +32,8 @@ class Game:
             self.Clouds.render(display, offset= render_scroll)
             self.Clouds.update()
             self.tilemap.render(display)
+            self.Player.update(self.tilemap)
+            self.Player.render(display)
 
         elif self.state == "Quit":
             pygame.quit()

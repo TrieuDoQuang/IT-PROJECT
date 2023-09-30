@@ -4,7 +4,7 @@ import os
 Base_IMG_PATH = 'Data/Assets/'
 
 def Load_IMG(path):
-    img = pygame.image.load(Base_IMG_PATH + path).convert()
+    img = pygame.image.load(Base_IMG_PATH + path).convert_alpha()
     img.set_colorkey('black')
     return img
 
@@ -16,9 +16,9 @@ def Load_IMGS(path):
 
 def Sprite_sheet_IMGS(path, pos, width, height, offset, frames):
     images = []
-    sheet = pygame.image.load(Base_IMG_PATH + path).convert()
+    sheet = pygame.image.load(Base_IMG_PATH + path).convert_alpha()
     for i in range(frames):
-        surf = pygame.Surface((width, height)).convert()
+        surf = pygame.Surface((width, height)).convert_alpha()
         surf.blit(sheet, (0,0), (pos[0] + offset * i, pos[1], width, height))
         surf.set_colorkey('black')
         images.append(surf)
