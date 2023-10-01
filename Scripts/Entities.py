@@ -37,7 +37,7 @@ class PhysicsEntity():
 
     def update(self, tilemap):       
         self.Coll = {'left': False, 'right': False, "top": False, 'bottom': False}
-        frame_movement = self.Vel +  self.Dir
+        frame_movement = self.Vel  +  self.Dir
 
         self.pos[0] += frame_movement.x
         entity_rect = self.rect()

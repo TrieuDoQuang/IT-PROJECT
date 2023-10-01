@@ -10,7 +10,7 @@ class Game:
         self.assets = Assets
         self.state = "Main_Menu"
         self.block_size = 32
-        self.Clouds = Clouds(self.assets['Clouds'], size=(100, 50))
+        self.Clouds = Clouds(self.assets['Clouds'], size=(120, 50))
         self.Player = Player('Player', (100, 100), (32, 32), self.assets)
         self.Butt_Play = Button((screen_w/2 - 100, 250), (200, 50), 'red', 'Play', 'Play', text_color='white' ,text_size= 35)
         self.Butt_Exit = Button((screen_w/2 - 100, 320), (200, 50), 'red', 'Quit', 'Quit', text_color='white' ,text_size= 35)
@@ -27,7 +27,7 @@ class Game:
             self.Butt_Exit.render(display)
 
         elif self.state == "Play":
-            display.fill('yellow')
+            display.blit(pygame.transform.scale(self.assets['BG'], (screen_w, screen_h)), (0,0))
             render_scroll = (0,0)
             self.Clouds.render(display, offset= render_scroll)
             self.Clouds.update()

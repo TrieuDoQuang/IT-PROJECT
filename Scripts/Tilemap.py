@@ -15,8 +15,8 @@ AUTO_MAP = {
 }
 
 NEIGHBOR_OFFSET = [ (-1, 0), (-1,-1), (-1, 1), (0, 0), (0, -1), (0, 1), (1, 0), (1, -1), (1, 1) ]
-PHYSICS_TILES = {'Grass', 'Stone', 'Dirt'}
-AUTO_TILES = {'Grass', 'Stone', 'Dirt'}
+PHYSICS_TILES = {'grass', 'Stone', 'dirt'}
+AUTO_TILES = {'grass', 'stone', 'dirt'}
 
 class Tilemap:
     def __init__(self, game,tile_size = 32):
@@ -26,7 +26,7 @@ class Tilemap:
         self.offgrid_map = []
         for i in range(10):
             self.tilemap[str(3 + i) + ';10'] = {'type': 'grass', 'variant' : 1 ,'pos' :(3 + i, 10)}
-            self.tilemap[str(3 + i) + '9'] = {'type': 'dirt', 'variant' : 1 ,'pos' :(3 + i, 9)}
+            self.tilemap[str(3 + i) + ';9'] = {'type': 'dirt', 'variant' : 1 ,'pos' :(3 + i, 9)}
             self.tilemap['10;' + str(5 + i) ] = {'type': 'stone', 'variant' : 1 ,'pos' :(10, 5 + i)}
     
     def Tiles_around(self, pos):
