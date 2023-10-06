@@ -11,7 +11,7 @@ class Game:
         self.state = "Main_Menu"
         self.block_size = 32
         self.Clouds = Clouds(self.assets['Clouds'], count=20, size_mul = 2)
-        self.Player = Player('Player', (100, 100), (32, 32), self.assets, size_mul= 1, animoffset=(0, -31))
+        self.Player = Player('Player', (100, 100), (32, 32), self.assets, size_mul= 1, animoffset=(-35, -30))
         self.Butt_Play = Button((screen_w/2 - 100, 250), (200, 50), 'red', 'Play', 'Play', text_color='white' ,text_size= 35)
         self.Butt_Exit = Button((screen_w/2 - 100, 320), (200, 50), 'red', 'Quit', 'Quit', text_color='white' ,text_size= 35)
         self.tilemap = Tilemap(self, tile_size = 32)
