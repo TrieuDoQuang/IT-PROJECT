@@ -9,4 +9,8 @@ Assets= {
     'dirt': Load_IMGS('tiles/dirt'),
     'grass': Load_IMGS ('tiles/grass'),
     'Player/idle': Animation(Load_IMGS('entities/player/idle'), dur= 20),
+    'Player/jump': Animation(Load_IMGS('entities/player/jump'), dur= 20),
+    'Player/run': Animation(Load_IMGS('entities/player/run')),
+    'Player/slide': Animation(Load_IMGS('entities/player/slide'),),
+    'Player/wall_slide': Animation(Load_IMGS('entities/player/wall_slide'),),
 }
