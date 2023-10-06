@@ -26,14 +26,7 @@ class Tilemap:
         self.game = game
         self.tile_size = tile_size
         self.tilemap = {}
-        self.offgrid_map = []
-        for i in range(10):
-            self.tilemap[str(
-                3 + i) + ';10'] = {'type': 'grass', 'variant': 1, 'pos': (3 + i, 10)}
-            self.tilemap[str(
-                3 + i) + ';9'] = {'type': 'dirt', 'variant': 1, 'pos': (3 + i, 9)}
-            self.tilemap['10;' + str(5 + i)] = {'type': 'stone',
-                                                'variant': 1, 'pos': (10, 5 + i)}
+        self.offgrid_map = {}
 
     def Tiles_around(self, pos):
         Tiles = []
@@ -116,13 +109,16 @@ class Tilemap:
                 loc = str(x) + ';' + str(y)
                 if loc in self.tilemap:
                     tile = self.tilemap[loc]
-                    image = pygame.transform.scale(self.game.assets[tile['type']][tile['variant']], (32, 32))
+                    img = self.game.assets[tile['type']][0][tile['variant']]
+                    size = self.game.assets[tile['type']][1]
+                    image = pygame.transform.scale(img, (img.get_width() * size, img.get_height() * size))
                     surf.blit(image, (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))
 
         for loc in self.offgrid_map:
             tile = self.offgrid_map[loc]
             if tile['pos'][0] > minlocx and tile['pos'][0] < maxlocx:
                 if tile['pos'][1] > minlocy and tile['pos'][1] < maxlocy:
-                    image = pygame.transform.scale(
-                        self.game.assets[tile['type']][tile['variant']], (32, 32))
+                    img = self.game.assets[tile['type']][0][tile['variant']]
+                    size = self.game.assets[tile['type']][1]
+                    image = pygame.transform.scale(img, (img.get_width() * size, img.get_height() * size))
                     surf.blit(image, (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))
