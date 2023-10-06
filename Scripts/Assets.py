@@ -8,5 +8,5 @@ Assets= {
     'stone': Load_IMGS('tiles/stone'),
     'dirt': Load_IMGS('tiles/dirt'),
     'grass': Load_IMGS ('tiles/grass'),
-    'Player/idle': Animation(Load_IMGS('entities/player/idle'), dur= 20),
+    'Player/idle': Animation(Load_IMGS('entities/player/idle'), dur= 12),
 }
