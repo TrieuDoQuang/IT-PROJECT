@@ -20,14 +20,15 @@ class Player(PhysicsEntity):
             self.Air_time = 0
 
         self.Wall_slide = False
-        if self.Coll['right'] or self.Coll['left'] and self.Air_time > 4:
-            self.Wall_slide = True
-            self.Vel.y = min(self.Vel.y, 0.5)
-            if self.Coll['right']:
-                self.flip = False
-            else:
-                self.flip = True
-            self.set_action('wall_slide')
+        if self.Coll['right'] or self.Coll['left']:
+            if self.Air_time > 4:
+                self.Wall_slide = True
+                self.Vel.y = min(self.Vel.y, 0.5)
+                if self.Coll['right']:
+                    self.flip = False
+                else:
+                    self.flip = True
+                self.set_action('wall_slide')
 
         if self.Walljump and self.Air_time > 45:
             self.Air_time = 4
