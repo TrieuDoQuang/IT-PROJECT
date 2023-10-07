@@ -28,19 +28,59 @@ class Tilemap:
         self.tilemap = {}
         self.offgrid_map = {}
 
-    def Tiles_around(self, pos):
+    def Tiles_around(self, pos, size):
         Tiles = []
-        Tile_loc = (int(pos[0] // self.tile_size),
-                    int(pos[1] // self.tile_size))
-        for offset in NEIGHBOR_OFFSET:
-            check_loc = str(Tile_loc[0] + offset[0]) + ';' + str(Tile_loc[1] + offset[1])
+        Tile_loc = (int(pos[0] // self.tile_size), int(pos[1] // self.tile_size))
+        Tile_loc2 = (int((pos[0] + size[0] - self.tile_size) // self.tile_size), int((pos[1] + size[1] - self.tile_size) // self.tile_size))
+        width = Tile_loc2[0] - Tile_loc[0]
+        height = Tile_loc2[1] - Tile_loc[1]
+        #Check X
+        for i in range(-1, height):
+            check_loc = str(Tile_loc[0]) + ';' + str(Tile_loc[1] + i + 1)
             if check_loc in self.tilemap:
                 Tiles.append(self.tilemap[check_loc])
+
+            check_loc2 = str(Tile_loc2[0] + 1) + ';' + str(Tile_loc[1] + i + 1)
+            if check_loc2 in self.tilemap:
+                Tiles.append(self.tilemap[check_loc2])
+
+        #Check Y
+        for i in range(-1, width):
+            check_loc = str(Tile_loc[0] + i + 1) + ';' + str(Tile_loc[1])
+            if check_loc in self.tilemap:
+                Tiles.append(self.tilemap[check_loc])
+
+            check_loc2 = str(Tile_loc[0] + i + 1) + ';' + str(Tile_loc2[1] + 1)
+            if check_loc2 in self.tilemap:
+                Tiles.append(self.tilemap[check_loc2])
+        
+        #Check Diag
+        #(-1,-1)
+        check_loc = str(Tile_loc[0]) + ';' + str(Tile_loc[1])
+        if check_loc in self.tilemap:
+            Tiles.append(self.tilemap[check_loc])
+        #(1,-1)
+        check_loc = str(Tile_loc2[0] + 1) + ';' + str(Tile_loc[1])
+        if check_loc in self.tilemap:
+            Tiles.append(self.tilemap[check_loc])
+        #(1,1)
+        check_loc = str(Tile_loc2[0] + 1) + ';' + str(Tile_loc2[1]  + 1)
+        if check_loc in self.tilemap:
+            Tiles.append(self.tilemap[check_loc])
+        #(-1,1)
+        check_loc = str(Tile_loc[0]) + ';' + str(Tile_loc2[1]  + 1)
+        if check_loc in self.tilemap:
+            Tiles.append(self.tilemap[check_loc])
+
+        # for offset in NEIGHBOR_OFFSET:
+        #     check_loc = str(Tile_loc[0] + offset[0]) + ';' + str(Tile_loc[1] + offset[1])
+        #     if check_loc in self.tilemap:
+        #         Tiles.append(self.tilemap[check_loc])
         return Tiles
 
-    def physic_rects_around(self, pos):
+    def physic_rects_around(self, pos, size):
         rects = []
-        for tile in self.Tiles_around(pos):
+        for tile in self.Tiles_around(pos, size):
             if tile['type'] in PHYSICS_TILES:
                 rects.append(pygame.Rect(
                     tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size, self.tile_size, self.tile_size))

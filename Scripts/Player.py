@@ -51,5 +51,8 @@ class Player(PhysicsEntity):
     
     def render(self, surf, offset = (0,0)):
        img = pygame.transform.scale(self.animation.IMG(), (self.animation.IMG().get_width() * self.size_mul , self.animation.IMG().get_height() * self.size_mul))
+       ac = pygame.Surface(self.size)
+       pos = (self.rect().x - offset[0] , self.rect().y - offset[1])
+       surf.blit(ac, pos)
        surf.blit(pygame.transform.flip(img, self.flip, False), (self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
     

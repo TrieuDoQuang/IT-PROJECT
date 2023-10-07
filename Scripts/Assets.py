@@ -17,5 +17,5 @@ Assets= {
     'Player/jump': Animation(Load_IMGS('entities/player/jump'), dur= 13),
     'Player/run': Animation(Load_IMGS('entities/player/run')),
     # 'Player/slide': Animation(Load_IMGS('entities/player/slide'),),
-    'Player/wall_slide': Animation(Load_IMGS('entities/player/wall_slide'),),
+    'Player/wall_slide': Animation(Load_IMGS('entities/player/wall_slide')),  
 }
