@@ -1,7 +1,7 @@
 import pygame
 
 class PhysicsEntity():
-    def __init__(self, e_type ,pos, size, assets, Health = 100):
+    def __init__(self, e_type ,pos, size, assets, Health = 100, speed = 1.5):
         self.type = e_type
         self.pos = list(pos)
         self.size = size
@@ -9,6 +9,7 @@ class PhysicsEntity():
         self.Vel = pygame.math.Vector2()
         self.Dir = pygame.math.Vector2()
         self.Coll = {'left': False, 'right': False, "top": False, 'bottom': False}
+        self.speed = speed
 
         self.action = ''
         self.animations_offset = (-3, -3)
@@ -16,7 +17,6 @@ class PhysicsEntity():
         self.set_action('idle')
 
         self.jumps = 1
-        self.Walljump = False
 
         self.Dead = False
         self.Health = Health
@@ -37,39 +37,12 @@ class PhysicsEntity():
         if action != self.action:
             self.action = action
             self.animation = self.assets[self.type + '/' + self.action].copy()
-    
-    def Movement(self):
-        keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_w]:
-            self.jump()
-        elif keys[pygame.K_s]:
-            self.Dir.y = 1
-        else:
-            self.Dir.y = 0
-
-        if keys[pygame.K_a]:
-            self.Dir.x = -1
-        elif keys[pygame.K_d]:
-            self.Dir.x = 1
-        else:
-            self.Dir.x = 0
-        
-    def jump(self):
-        if self.jumps:
-            self.Vel.y = -1 * 3
-            self.jumps -= 1
-        if self.Coll['right'] or self.Coll['left']:
-            self.Walljump = True
-
-    def update(self, tilemap):  
-        self.Walljump = False
-        if self.type == 'Player':
-            self.Movement()     
+    def update(self, tilemap):     
             
         self.Coll = {'left': False, 'right': False, "top": False, 'bottom': False}
         frame_movement = self.Vel  +  self.Dir
-        self.pos[0] += frame_movement.x * 1.5
+        self.pos[0] += frame_movement.x * self.speed
         entity_rect = self.rect()
         for rect in tilemap.physic_rects_around(self.pos, self.size):
             if entity_rect.colliderect(rect):

@@ -139,25 +139,25 @@ class Tilemap:
 
     def render(self, surf, offset):
         maxlocx = (screen_w + offset[0]) // self.tile_size + 1
-        minlocx = (offset[0]) // self.tile_size - 1
+        minlocx = (offset[0]) // self.tile_size - 2
 
         maxlocy = (screen_h + offset[1]) // self.tile_size + 1
-        minlocy = (offset[1]) // self.tile_size - 1
+        minlocy = (offset[1]) // self.tile_size - 2
+        
+        for loc in self.offgrid_map:
+            tile = self.offgrid_map[loc]
+            if tile['pos'][0] > minlocx and tile['pos'][0] < maxlocx:
+                if tile['pos'][1] > minlocy and tile['pos'][1] < maxlocy:
+                    img = self.game.assets[tile['type']][0][tile['variant']]
+                    size = self.game.assets[tile['type']][1]
+                    image = pygame.transform.scale(img, (img.get_width() * size, img.get_height() * size))
+                    surf.blit(image, (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))
 
         for x in range(offset[0] // self.tile_size, (offset[0] + surf.get_width()) // self.tile_size + 1):
             for y in range(offset[1]//self.tile_size, (offset[1] + surf.get_height()) // self.tile_size + 1):
                 loc = str(x) + ';' + str(y)
                 if loc in self.tilemap:
                     tile = self.tilemap[loc]
-                    img = self.game.assets[tile['type']][0][tile['variant']]
-                    size = self.game.assets[tile['type']][1]
-                    image = pygame.transform.scale(img, (img.get_width() * size, img.get_height() * size))
-                    surf.blit(image, (tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))
-
-        for loc in self.offgrid_map:
-            tile = self.offgrid_map[loc]
-            if tile['pos'][0] > minlocx and tile['pos'][0] < maxlocx:
-                if tile['pos'][1] > minlocy and tile['pos'][1] < maxlocy:
                     img = self.game.assets[tile['type']][0][tile['variant']]
                     size = self.game.assets[tile['type']][1]
                     image = pygame.transform.scale(img, (img.get_width() * size, img.get_height() * size))
