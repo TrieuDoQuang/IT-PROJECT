@@ -14,8 +14,8 @@ class Editor():
             'stone' : [Load_IMGS('tiles/stone'), 2],
             'large_decor' : [Load_IMGS('tiles/large_decor'), 3],
             'dirt': [Load_IMGS('tiles/dirt'), 2],
-            # 'Spawner' : Load_IMGS('tiles/spawners'),
-            # 'Boss' : Load_IMGS('tiles/boss')
+            'Spawner' : [Load_IMGS('tiles/spawners'), 2],
+            # 'Boss' : [Load_IMGS('tiles/boss'), 2]
         }
 
         self.Tilemap = Tilemap(self)

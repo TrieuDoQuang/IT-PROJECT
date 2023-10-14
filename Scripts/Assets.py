@@ -28,4 +28,9 @@ Assets = {
     'Player/die': Animation(Load_IMGS('entities/player/die'), dur=13, loop=False),
     'Player/attack0': Animation(Load_IMGS('entities/player/attack1'), dur=7, loop=False),
     'Player/attack1': Animation(Load_IMGS('entities/player/attack2'), dur=8, loop=False),
+    #Enemies ANIMS
+    'Skeleton/idle' : Animation(Load_IMGS('entities/enemies/skeleton/idle'), dur=13),
+    'Thug/idle' : Animation(Load_IMGS('entities/enemies/thug/idle'), dur=13),
+    'Wizard/idle' : Animation(Load_IMGS('entities/enemies/wizard/idle'), dur=13),
+    'Zombie/idle' : Animation(Load_IMGS('entities/enemies/zombie/idle'), dur=13),
 }

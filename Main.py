@@ -65,9 +65,9 @@ class Game:
 
             # Particles leaf random
             for rect in self.Leaf_spawner:
-                if random.random() * 49000 < rect.width * rect.height:
-                    pos = (rect.x + random.random() * rect.width,
-                           rect.y + random.random() * rect.height)
+                if random.random() * 20000 < rect.width * rect.height:
+                    pos = (rect.x + random.random() * (rect.width + 64),
+                           rect.y + random.random() * (rect.height + 64))
                     self.Particles.append(Particles(
                         self.assets, 'leaf', pos, velocity=[-0.1, 0.3], frame=random.randint(0, 20)))
             #
