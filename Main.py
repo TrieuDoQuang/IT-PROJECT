@@ -8,6 +8,7 @@ from Scripts.Player import Player
 from Scripts.Assets import *
 from Scripts.Tilemap import Tilemap
 from Scripts.Particles import Particles
+from Scripts.Enemies import *
 
 
 class Game:
@@ -39,6 +40,8 @@ class Game:
         for tree in self.tilemap.extract([('large_decor', 2)], True):
             self.Leaf_spawner.append(pygame.Rect(
                 tree['pos'][0] + 4, tree['pos'][1] + 4, 23, 13))
+        
+        self.enemies = [Skeleton()]
 
     def run(self):
         if self.state == "Main_Menu":
@@ -78,6 +81,11 @@ class Game:
             self.scroll[1] += (self.Player.rect().centery -
                                display.get_height()/2 - self.scroll[1]) / 20  # type: ignore
             render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
+
+            #ENEMIES HANDLER
+            for i in self.enemies.copy():
+                i.update(self.tilemap)
+                i.render(display, offset=render_scroll)
 
             # RENDERS
             self.Clouds.render(display, offset=render_scroll)
