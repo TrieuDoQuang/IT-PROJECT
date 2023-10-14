@@ -44,10 +44,13 @@ class Game:
             self.Player.pos[0] = ply['pos'][0]
             self.Player.pos[1] = ply['pos'][1]
         
-        # self.enemies = [Skeleton('Skeleton', (-350,0), (32,80), self.assets, scale= 3, animations_offset=(-78, -64))]
-        self.enemies = []
-        for enemy in self.tilemap.extract([('Spawner', 2)], keep=False):
-            self.enemies.append(Skeleton('Skeleton', (enemy['pos'][0],enemy['pos'][1]), (32,80), self.assets, scale= 3, animations_offset=(-78, -64)))
+        # self.enemies = []
+        #self.enemies = [Thug('Thug', (500,0), (24,54), self.assets, scale= 3, animations_offset=(-7, -2))]
+        #self.enemies = [Wizard('Wizard', (500,0), (40,73), self.assets, scale= 3, animations_offset=(-76, -71))]
+        #self.enemies = [Skeleton('Skeleton',(500,0), (32,80), self.assets, scale= 3, animations_offset=(-78, -64))]
+        self.enemies = [Zombie('Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28))]
+        # for enemy in self.tilemap.extract([('Spawner', 2)], keep=False):
+        #     self.enemies.append(Skeleton('Skeleton', (enemy['pos'][0],enemy['pos'][1]), (32,80), self.assets, scale= 3, animations_offset=(-78, -64)))
 
     def run(self):
         if self.state == "Main_Menu":

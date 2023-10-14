@@ -28,11 +28,18 @@ Assets = {
     'Player/die': Animation(Load_IMGS('entities/player/die'), dur=13, loop=False),
     'Player/attack0': Animation(Load_IMGS('entities/player/attack1'), dur=7, loop=False),
     'Player/attack1': Animation(Load_IMGS('entities/player/attack2'), dur=8, loop=False),
-    #Enemies ANIMS
-    'Skeleton/idle' : Animation(Load_IMGS('entities/enemies/skeleton/idle'), dur=10),
-    'Skeleton/run' : Animation(Load_IMGS('entities/enemies/skeleton/run'), dur=10),
-    'Skeleton/attack' : Animation(Load_IMGS('entities/enemies/skeleton/attack'), dur=10),
-    'Thug/idle' : Animation(Load_IMGS('entities/enemies/thug/idle'), dur=13),
-    'Wizard/idle' : Animation(Load_IMGS('entities/enemies/wizard/idle'), dur=13),
-    'Zombie/idle' : Animation(Load_IMGS('entities/enemies/zombie/idle'), dur=13),
+    # Enemies ANIMS
+    # Skeleton
+    'Skeleton/idle': Animation(Load_IMGS('entities/enemies/skeleton/idle'), dur=10),
+    'Skeleton/run': Animation(Load_IMGS('entities/enemies/skeleton/run'), dur=10),
+    'Skeleton/attack': Animation(Load_IMGS('entities/enemies/skeleton/attack'), dur=10),
+    # Thug
+    'Thug/idle': Animation(Load_IMGS('entities/enemies/thug/idle'), dur=13),
+    'Thug/run': Animation(Load_IMGS('entities/enemies/thug/run'), dur=10),
+    # Wizard
+    'Wizard/idle': Animation(Load_IMGS('entities/enemies/wizard/idle'), dur=13),
+    'Wizard/run': Animation(Load_IMGS('entities/enemies/wizard/run'), dur=10),
+    # Zombie
+    'Zombie/idle': Animation(Load_IMGS('entities/enemies/zombie/idle'), dur=13),
+    'Zombie/run': Animation(Load_IMGS('entities/enemies/zombie/run'), dur=10),
 }
