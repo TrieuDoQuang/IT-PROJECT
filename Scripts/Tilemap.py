@@ -86,6 +86,22 @@ class Tilemap:
                     tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size, self.tile_size, self.tile_size))
         return rects
     
+    def solid_check(self, pos, size, flip):
+        block = None
+        Tile_loc = (int(pos[0] // self.tile_size), int((pos[1] + size[1]) // self.tile_size))
+        Tile_loc2 = (int((pos[0] + size[0]) // self.tile_size), int((pos[1] + size[1]) // self.tile_size))
+        check_loc = str(Tile_loc[0] - 1) + ';' + str(Tile_loc[1])
+        check_loc2 = str(Tile_loc2[0] + 1) + ';' + str(Tile_loc2[1])
+        if flip == True:
+            if check_loc in self.tilemap:
+                if self.tilemap[check_loc]['type'] in PHYSICS_TILES:
+                    block = self.tilemap[check_loc]
+        else:
+            if check_loc2 in self.tilemap:
+                if self.tilemap[check_loc2]['type'] in PHYSICS_TILES:
+                    block = self.tilemap[check_loc2]
+        return block
+    
     def AutoTile(self):
         for loc in self.tilemap:
             tile = self.tilemap[loc]

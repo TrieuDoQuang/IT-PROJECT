@@ -14,8 +14,8 @@ class Editor():
             'stone' : [Load_IMGS('tiles/stone'), 2],
             'large_decor' : [Load_IMGS('tiles/large_decor'), 3],
             'dirt': [Load_IMGS('tiles/dirt'), 2],
-            'Spawner' : [Load_IMGS('tiles/spawners'), 2],
-            # 'Boss' : [Load_IMGS('tiles/boss'), 2]
+            'Spawner' : [Load_IMGS('tiles/spawners'), 1],
+            'Boss' : [Load_IMGS('tiles/booses'), 2]
         }
 
         self.Tilemap = Tilemap(self)
@@ -32,8 +32,8 @@ class Editor():
 
     def Run(self):
 
-        self.scroll[0] += (Movement[1] - Movement[0]) * 2
-        self.scroll[1] += (Movement[3] - Movement[2]) * 2
+        self.scroll[0] += (Movement[1] - Movement[0]) * 5
+        self.scroll[1] += (Movement[3] - Movement[2]) * 5
 
         Display.fill('purple')
         current_tile_img = self.assets[self.Tile_list[self.Tile_group]][0][self.Tile_variant].copy()
