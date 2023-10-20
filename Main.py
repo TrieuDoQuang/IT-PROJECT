@@ -19,6 +19,7 @@ class Game:
         self.block_size = 32
         self.scroll = [0, 0]
         self.Clouds = Clouds(self.assets['Clouds'], count=20, size_mul=2)
+        self.hands = []
         self.Player = Player('Player', (250, 100), (25, 64), self.assets, size_mul=1, animoffset=(-32, 0))
         self.Butt_Play = Button((screen_w/2 - 100, 250), (200, 50),
                                 'red', 'Play', 'Play', text_color='white', text_size=35)
@@ -36,6 +37,9 @@ class Game:
         # Particles leaf
         self.Particles = []
 
+        # Projectiles
+        self.Projectile = []
+
         self.Leaf_spawner = []
         for tree in self.tilemap.extract([('large_decor', 2)], True):
             self.Leaf_spawner.append(pygame.Rect(tree['pos'][0] + 4, tree['pos'][1] + 4, 23, 13))
@@ -46,11 +50,9 @@ class Game:
             self.Player.pos[1] = ply['pos'][1]
         
         #WEAPONS
+        self.hands.append(Rifle((15, 15), self.Player.pos, (30, 15), self.Projectile, scale= 1.2, offsetR=(20, 25), offsetL=(2, 50)))
+        self.hands.append(Pistol((15, 15), self.Player.pos, (10, 15), self.Projectile, scale= 1.2, offsetR=(30, 25), offsetL=(5, 30)))
         self.hand_idx = 0
-        self.hands = [
-            Rifle((15, 15), self.Player.pos, (30, 15), scale= 1.2, offsetR=(20, 25), offsetL=(2, 50)),
-            # Pistol((15, 15), self.Player.pos, (10, 15), scale= 1.2, offsetR=(30, 25), offsetL=(5, 30))
-        ]
         
         # self.enemies = []
         # self.enemies = [Thug('Thug', (500,0), (24,54), self.assets, scale= 3.5, animations_offset=(-7, -2))]
@@ -99,9 +101,26 @@ class Game:
                                display.get_height()/2 - self.scroll[1]) / 20  # type: ignore
             render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
 
+
             # RENDERS
             self.Clouds.render(display, offset=render_scroll)
             self.Clouds.update()
+
+            # PROJECTILE HANDLER
+            for i in self.Projectile.copy():
+                i.update()
+                i.render(display, offset = render_scroll)
+                if i.kill:
+                    self.Projectile.remove(i)
+                if self.tilemap.Tiles_around(i.pos, i.size):
+                    self.Projectile.remove(i)
+                for ene in self.enemies.copy():
+                    if ene.rect().colliderect(i.rect()):
+                        ene.hurt(i.dame)
+                        self.Projectile.remove(i)
+                    if ene.Dead:
+                        self.enemies.remove(ene)
+
             self.tilemap.render(display, offset=render_scroll)
             self.Player.update(self.tilemap, offset=render_scroll)
             self.Player.render(display, offset=render_scroll)
@@ -109,6 +128,8 @@ class Game:
             # HAND HANDLER
             self.hands[self.hand_idx].render(display, player= self.Player, offset=render_scroll)
             self.hands[self.hand_idx].update(offset=render_scroll, player=self.Player)
+            if click:
+                self.hands[self.hand_idx].attack(self)
 
             #ENEMIES HANDLER
             for i in self.enemies.copy():
@@ -149,6 +170,7 @@ if __name__ == '__main__':
     display = pygame.surface.Surface((screen_w, screen_h))
     clock = pygame.time.Clock()
     level = 0
+    click = False
 
     FPS = 60  # FRAMERATE LIMITER
     game = Game()
@@ -159,9 +181,17 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    game.hands[0].attack()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if game.state == 'Play':
+                    if event.button == 1:
+                        click = True
+                    if event.button == 4:
+                        game.hand_idx = (game.hand_idx + 1) % len(game.hands)
+                    if event.button == 5:
+                        game.hand_idx = (game.hand_idx - 1) % len(game.hands)
+            if event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    click = False
 
         game.run()
         screen.blit(pygame.transform.scale(

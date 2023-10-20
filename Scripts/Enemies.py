@@ -2,7 +2,7 @@ from Scripts.Entities import *
 import pygame, random
 
 class Skeleton(PhysicsEntity):
-    def __init__(self, e_type, pos, size, assets, Health=100, speed=1.5, scale = 1, animations_offset=(0, 0)):
+    def __init__(self, e_type, pos, size, assets, Health = 250, speed=1.5, scale = 1, animations_offset=(0, 0)):
         super().__init__(e_type, pos, size, assets, Health, speed)
         self.scale = scale
         self.animations_offset = animations_offset
@@ -74,7 +74,7 @@ class Skeleton(PhysicsEntity):
         surf.blit(pygame.transform.flip(img, self.flip, False), (self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
 
 class Thug(PhysicsEntity):
-    def __init__(self, e_type, pos, size, assets, Health=100, speed=1.5, scale = 1, animations_offset=(0, 0)):
+    def __init__(self, e_type, pos, size, assets, Health = 100, speed=1.5, scale = 1, animations_offset=(0, 0)):
         super().__init__(e_type, pos, size, assets, Health, speed)
         self.scale = scale
         self.animations_offset = animations_offset
@@ -146,7 +146,7 @@ class Thug(PhysicsEntity):
         surf.blit(pygame.transform.flip(img, self.flip, False),(self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
 
 class Wizard(PhysicsEntity):
-    def __init__(self, e_type, pos, size, assets, Health=100, speed=1.5, scale = 1, animations_offset=(0, 0)):
+    def __init__(self, e_type, pos, size, assets, Health = 100, speed=1.5, scale = 1, animations_offset=(0, 0)):
         super().__init__(e_type, pos, size, assets, Health, speed)
         self.scale = scale
         self.animations_offset = animations_offset
@@ -218,7 +218,7 @@ class Wizard(PhysicsEntity):
         surf.blit(pygame.transform.flip(img, self.flip, False),(self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
 
 class Zombie(PhysicsEntity):
-    def __init__(self, e_type, pos, size, assets, Health=100, speed=1.5, scale = 1, animations_offset=(0, 0)):
+    def __init__(self, e_type, pos, size, assets, Health = 150, speed=1.5, scale = 1, animations_offset=(0, 0)):
         super().__init__(e_type, pos, size, assets, Health, speed)
         self.scale = scale
         self.animations_offset = animations_offset
@@ -236,6 +236,11 @@ class Zombie(PhysicsEntity):
             self.flip = not self.flip
         self.Dir.x = (-1 if self.flip else 1)
 
+    def hurt(self, dame):
+        self.Health -= dame
+        if self.Health <= 0:
+            self.Dead = True
+    
     # def attack(self):
     #     self.attacking = 100
 

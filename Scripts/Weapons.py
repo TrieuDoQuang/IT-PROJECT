@@ -1,8 +1,9 @@
 import pygame, math, copy
 from Scripts.Assets import Assets
+from Scripts.Projectile import *
 
 class Weapon:
-    def __init__(self, type, size, pos, pivot, dame = 100, scale = 1, offsetL = (0,0), offsetR = (0,0), delay = 500, ammo = 50):
+    def __init__(self, type, size, pos, pivot, projectile, dame = 100, scale = 1, offsetL = (0,0), offsetR = (0,0), delay = 500, ammo = 50):
         self.type = type
         self.pos = pos
         self.size = size
@@ -18,11 +19,13 @@ class Weapon:
         self.delay = delay
         self.timer= 0
         self.ammo = ammo
+        self.projectile = projectile
+        self.flip = 1
 
     def rect(self):
         return pygame.Rect(self.pos, self.size)
     
-    def attack(self):
+    def attack(self, game):
         pass
     
     def set_action(self, action):
@@ -55,6 +58,9 @@ class Weapon:
         rads %= 2*math.pi
         degs = round(math.degrees(rads))
         self.angle = degs
+        self.flip = 1
+        if self.angle > 90 and self.angle < 270:
+            self.flip = -1
         if player.flip:
             self.offset = self.offsetL
         else:
@@ -67,32 +73,40 @@ class Weapon:
             surf.blit(rotate_img, (rotated_image_rect.x - offset[0], rotated_image_rect.y - offset[1]))
 
 class Pistol(Weapon):
-    def __init__(self, size, pos, pivot, dame=100, scale=1, offsetL=(0, 0), offsetR=(0, 0), delay=500, ammo=50):
-        super().__init__('pistol', size, pos, pivot, dame, scale, offsetL, offsetR, delay, ammo)
+    def __init__(self, size, pos, pivot, projectile,  dame= 50, scale=1, offsetL=(0, 0), offsetR=(0, 0), delay= 1000, ammo=50):
+        super().__init__('pistol', size, pos, pivot, projectile, dame, scale, offsetL, offsetR, delay, ammo)
     
     def update(self, offset, player):
         super().update(offset, player)
         if self.action == 'shoot' and self.animation.done:
             self.set_action('idle')
     
-    def attack(self):
-        current = pygame.time.get_ticks()
-        if current - self.timer >= self.delay:
-            self.set_action('shoot')
-            self.timer = pygame.time.get_ticks()
+    def attack(self, game):
+        if self.ammo:
+            if not game.Player.is_dash and not game.Player.Wall_slide:
+                current = pygame.time.get_ticks()
+                if current - self.timer >= self.delay:
+                    self.set_action('shoot')
+                    self.projectile.append(Projectile(game, 'small', (game.Player.rect().centerx ,game.Player.rect().centery - 15), self.flip, 8, (15, 10), self.angle, dame = self.dame, showtime= 100))
+                    self.ammo -= 1
+                    self.timer = pygame.time.get_ticks()
 
 class Rifle(Weapon):
-    def __init__(self, size, pos, pivot, dame=100, scale=1, offsetL=(0, 0), offsetR=(0, 0), delay=500, ammo=50):
-        super().__init__('rifle', size, pos, pivot, dame, scale, offsetL, offsetR, delay, ammo)
+    def __init__(self, size, pos, pivot, projectile,  dame = 20, scale=1, offsetL=(0, 0), offsetR=(0, 0), delay= 400, ammo=50):
+        super().__init__('rifle', size, pos, pivot, projectile, dame, scale, offsetL, offsetR, delay, ammo)
     
     def update(self, offset, player):
         super().update(offset, player)
         if self.action == 'shoot' and self.animation.done:
             self.set_action('idle')
     
-    def attack(self):
-        current = pygame.time.get_ticks()
-        if current - self.timer >= self.delay:
-            self.set_action('shoot')
-            self.timer = pygame.time.get_ticks()
+    def attack(self, game):
+        if self.ammo:
+            if not game.Player.is_dash and not game.Player.Wall_slide:
+                current = pygame.time.get_ticks()
+                if current - self.timer >= self.delay:
+                    self.set_action('shoot')
+                    self.projectile.append(Projectile(game, 'small', (game.Player.rect().centerx,game.Player.rect().centery - 5 ), self.flip, 8, (15, 10), self.angle, dame = self.dame, showtime= 150))
+                    self.ammo -= 1
+                    self.timer = pygame.time.get_ticks()
 

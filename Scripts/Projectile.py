@@ -1,17 +1,50 @@
-import pygame
+import pygame, math
+from Scripts.Assets import Assets
 
 class Projectile:
-    def __init__(self, game, type, pos, vel, speed, angle, dame):
+    def __init__(self, game, type, pos, vel, speed, size, angle, dame = 10, showtime = 250):
         self.type = type
         self.game = game
-        self.pos = pos
+        self.pos = list(pos)
         self.vel = vel
         self.speed = speed
         self.angle = angle
         self.dame = dame
+        self.img = Assets['bullet' + '/' + self.type]
+        self.size = size
+        self.alive_time = 2000
+        self.timer = pygame.time.get_ticks()
+        self.kill = False
+        self.showtime = showtime
+        self.flip = False
     
     def update(self):
-        pass
+        self.current_time = pygame.time.get_ticks()
+        rad = math.radians(self.angle)
+        dy = - math.tan(rad) * self.vel
+        dir = pygame.Vector2(self.vel, dy)
+        if dir.magnitude():
+            dir = pygame.Vector2.normalize(dir)
+        dir *= self.speed
+        self.pos[0] += dir[0]
+        self.pos[1] += dir[1]
+        self.flip = False
+        if self.vel < 0:
+            self.flip = True
+        self.destroy()
+    
+    def rect(self):
+        return pygame.Rect(self.pos, self.size)
+
+    def destroy(self):
+        if self.current_time - self.timer >= self.alive_time:
+            self.kill = True
 
     def render(self, surf, offset = (0,0)):
-        pass
+        if self.current_time - self.timer >= self.showtime:
+            # black = pygame.Surface(self.size)
+            # rect = pygame.Rect((self.pos[0] - offset[0], self.pos[1] - offset[1]), self.size)
+            # surf.blit(black, rect)
+            img = pygame.transform.rotate(self.img, self.angle)
+            img.set_colorkey('black')
+            surf.blit(img, (self.pos[0] - offset[0], self.pos[1] - offset[1]))

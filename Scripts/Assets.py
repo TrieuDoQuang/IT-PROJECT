@@ -47,6 +47,9 @@ Assets = {
     'pistol/idle': Animation(Load_IMGS('weapons/pistol/idle')),
     'pistol/shoot': Animation(Load_IMGS('weapons/pistol/shoot'), dur= 3, loop= False),
     'rifle/idle': Animation(Load_IMGS('weapons/rifle/idle')),
-    'rifle/shoot': Animation(Load_IMGS('weapons/rifle/shoot'), dur= 2, loop= False),
+    'rifle/shoot': Animation(Load_IMGS('weapons/rifle/shoot'), dur= 1, loop= False),
     'weapons/M15': Load_IMG('weapons/M15.png'),
+
+    #BOOLETS
+    'bullet/small': Load_IMG('weapons/PistolAmmoBig.png')
 }

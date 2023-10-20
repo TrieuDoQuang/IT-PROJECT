@@ -5,6 +5,7 @@ class Player(PhysicsEntity):
     def __init__(self, e_type, pos, size, assets, Health = 400, speed = 2, size_mul = 1, animoffset = (-3, -3)):
         super().__init__(e_type, pos, size, assets, Health, speed= speed)
         self.size_mul = size_mul
+        self.hand_idx = 0
         self.animations_offset = list(animoffset)
         self.Air_time = 0
         self.Wall_slide = False
@@ -33,7 +34,7 @@ class Player(PhysicsEntity):
         rads %= 2*math.pi
         degs = round(math.degrees(rads))
         self.angle = degs
-        if self.angle > 90 and self.angle <= 270:
+        if self.angle > 90 and self.angle < 270:
             self.flip = True
         else:
             self.flip = False
