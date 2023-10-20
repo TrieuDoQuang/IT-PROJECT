@@ -41,5 +41,12 @@ Assets = {
     'Wizard/run': Animation(Load_IMGS('entities/enemies/wizard/run'), dur=10),
     # Zombie
     'Zombie/idle': Animation(Load_IMGS('entities/enemies/zombie/idle'), dur=13),
-    'Zombie/run': Animation(Load_IMGS('entities/enemies/zombie/run'), dur=10),
+    'Zombie/run': Animation(Load_IMGS('entities/enemies/zombie/run'), dur=7),
+
+    #WEAPONS
+    'pistol/idle': Animation(Load_IMGS('weapons/pistol/idle')),
+    'pistol/shoot': Animation(Load_IMGS('weapons/pistol/shoot'), dur= 3, loop= False),
+    'rifle/idle': Animation(Load_IMGS('weapons/rifle/idle')),
+    'rifle/shoot': Animation(Load_IMGS('weapons/rifle/shoot'), dur= 2, loop= False),
+    'weapons/M15': Load_IMG('weapons/M15.png'),
 }

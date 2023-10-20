@@ -73,7 +73,6 @@ class Skeleton(PhysicsEntity):
         img = pygame.transform.scale(self.animation.IMG(), (self.animation.IMG().get_width() * self.scale , self.animation.IMG().get_height() * self.scale))
         surf.blit(pygame.transform.flip(img, self.flip, False), (self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
 
-
 class Thug(PhysicsEntity):
     def __init__(self, e_type, pos, size, assets, Health=100, speed=1.5, scale = 1, animations_offset=(0, 0)):
         super().__init__(e_type, pos, size, assets, Health, speed)
@@ -145,7 +144,6 @@ class Thug(PhysicsEntity):
 
         img = pygame.transform.scale(self.animation.IMG(), (self.animation.IMG().get_width() * self.scale, self.animation.IMG().get_height() * self.scale))
         surf.blit(pygame.transform.flip(img, self.flip, False),(self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
-
 
 class Wizard(PhysicsEntity):
     def __init__(self, e_type, pos, size, assets, Health=100, speed=1.5, scale = 1, animations_offset=(0, 0)):
@@ -280,15 +278,24 @@ class Zombie(PhysicsEntity):
 
     def render(self, surf, offset=(0, 0)):
         #HITBOX DEBUG
-        ac = pygame.Surface(self.size)
-        pos = (self.rect().x - offset[0] , self.rect().y - offset[1])
-        surf.blit(ac, pos)
-        if self.dbg:
-            rect = pygame.Rect(self.dbg['pos'][0] * 32 -offset[0], self.dbg['pos'][1] *32 - offset[1], 32, 32)
-            ac2 = pygame.Surface((32, 32))
-            surf.blit(ac2, rect)
+        # ac = pygame.Surface(self.size)
+        # pos = (self.rect().x - offset[0] , self.rect().y - offset[1])
+        # surf.blit(ac, pos)
+        # if self.dbg:
+        #     rect = pygame.Rect(self.dbg['pos'][0] * 32 -offset[0], self.dbg['pos'][1] *32 - offset[1], 32, 32)
+        #     ac2 = pygame.Surface((32, 32))
+        #     surf.blit(ac2, rect)
 
+        # img = pygame.transform.scale(self.animation.IMG(), (self.animation.IMG().get_width() * self.scale, self.animation.IMG().get_height() * self.scale))
+        # surf.blit(pygame.transform.flip(img, self.flip, False),(self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
         img = pygame.transform.scale(self.animation.IMG(), (self.animation.IMG().get_width() * self.scale, self.animation.IMG().get_height() * self.scale))
-        surf.blit(pygame.transform.flip(img, self.flip, False),(self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
+        img_m15 = pygame.transform.scale(self.assets['weapons/M15'], (self.assets['weapons/M15'].get_width() * 1.5, self.assets['weapons/M15'].get_height() * 1.5))
+        rect = self.rect()        
+        if self.flip:
+            surf.blit(pygame.transform.flip(img, self.flip, False),(self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
+            surf.blit(pygame.transform.flip(img_m15, self.flip, False),(rect.centerx - offset[0] - 50, rect.centery -  offset[1]))
+        else:
+            surf.blit(pygame.transform.flip(img, self.flip, False),(self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
+            surf.blit(pygame.transform.flip(img_m15, self.flip, False),(rect.centerx - offset[0], rect.centery - offset[1] - 3))
 
 

@@ -9,6 +9,7 @@ from Scripts.Assets import *
 from Scripts.Tilemap import Tilemap
 from Scripts.Particles import Particles
 from Scripts.Enemies import *
+from Scripts.Weapons import *
 
 
 class Game:
@@ -44,10 +45,17 @@ class Game:
             self.Player.pos[0] = ply['pos'][0]
             self.Player.pos[1] = ply['pos'][1]
         
+        #WEAPONS
+        self.hand_idx = 0
+        self.hands = [
+            Rifle((15, 15), self.Player.pos, (30, 15), scale= 1.2, offsetR=(20, 25), offsetL=(2, 50)),
+            # Pistol((15, 15), self.Player.pos, (10, 15), scale= 1.2, offsetR=(30, 25), offsetL=(5, 30))
+        ]
+        
         # self.enemies = []
-        #self.enemies = [Thug('Thug', (500,0), (24,54), self.assets, scale= 3, animations_offset=(-7, -2))]
-        #self.enemies = [Wizard('Wizard', (500,0), (40,73), self.assets, scale= 3, animations_offset=(-76, -71))]
-        #self.enemies = [Skeleton('Skeleton',(500,0), (32,80), self.assets, scale= 3, animations_offset=(-78, -64))]
+        # self.enemies = [Thug('Thug', (500,0), (24,54), self.assets, scale= 3.5, animations_offset=(-7, -2))]
+        # self.enemies = [Wizard('Wizard', (500,0), (40,73), self.assets, scale= 3, animations_offset=(-76, -71))]
+        # self.enemies = [Skeleton('Skeleton',(500,0), (32,80), self.assets, scale= 3, animations_offset=(-78, -64))]
         self.enemies = [Zombie('Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28))]
         # for enemy in self.tilemap.extract([('Spawner', 2)], keep=False):
         #     self.enemies.append(Skeleton('Skeleton', (enemy['pos'][0],enemy['pos'][1]), (32,80), self.assets, scale= 3, animations_offset=(-78, -64)))
@@ -95,10 +103,14 @@ class Game:
             self.Clouds.render(display, offset=render_scroll)
             self.Clouds.update()
             self.tilemap.render(display, offset=render_scroll)
-            self.Player.update(self.tilemap)
+            self.Player.update(self.tilemap, offset=render_scroll)
             self.Player.render(display, offset=render_scroll)
 
-             #ENEMIES HANDLER
+            # HAND HANDLER
+            self.hands[self.hand_idx].render(display, player= self.Player, offset=render_scroll)
+            self.hands[self.hand_idx].update(offset=render_scroll, player=self.Player)
+
+            #ENEMIES HANDLER
             for i in self.enemies.copy():
                 i.update(self.tilemap, self.Player)
                 i.render(display, offset=render_scroll)
@@ -147,6 +159,9 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    game.hands[0].attack()
 
         game.run()
         screen.blit(pygame.transform.scale(
