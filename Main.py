@@ -7,10 +7,9 @@ from Scripts.Clouds import Clouds
 from Scripts.Player import Player
 from Scripts.Assets import *
 from Scripts.Tilemap import Tilemap
-from Scripts.Particles import Particles
+from Scripts.Particles import *
 from Scripts.Enemies import *
 from Scripts.Weapons import *
-
 
 class Game:
     def __init__(self):
@@ -21,10 +20,8 @@ class Game:
         self.Clouds = Clouds(self.assets['Clouds'], count=20, size_mul=2)
         self.hands = []
         self.Player = Player('Player', (250, 100), (25, 64), self.assets, size_mul=1, animoffset=(-32, 0))
-        self.Butt_Play = Button((screen_w/2 - 100, 250), (200, 50),
-                                'red', 'Play', 'Play', text_color='white', text_size=35)
-        self.Butt_Exit = Button((screen_w/2 - 100, 320), (200, 50),
-                                'red', 'Quit', 'Quit', text_color='white', text_size=35)
+        self.Butt_Play = Button((screen_w/2 - 100, 250), (200, 50), 'red', 'Play', 'Play', text_color='white', text_size=35)
+        self.Butt_Exit = Button((screen_w/2 - 100, 320), (200, 50), 'red', 'Quit', 'Quit', text_color='white', text_size=35)
         self.tilemap = Tilemap(self, tile_size=32)
         self.transition = -30
         dest = 'Data/Maps/' + str(level) + '.json'
@@ -34,7 +31,7 @@ class Game:
             pass
         self.temp = 1
 
-        # Particles leaf
+        # Particles
         self.Particles = []
 
         # Projectiles
@@ -43,6 +40,8 @@ class Game:
         self.Leaf_spawner = []
         for tree in self.tilemap.extract([('large_decor', 2)], True):
             self.Leaf_spawner.append(pygame.Rect(tree['pos'][0] + 4, tree['pos'][1] + 4, 23, 13))
+        
+        self.Particles.append(Leafs(self, self.Leaf_spawner))
 
         #Extract Player pos
         for ply in self.tilemap.extract([('Spawner', 0)], keep=False):
@@ -50,17 +49,21 @@ class Game:
             self.Player.pos[1] = ply['pos'][1]
         
         #WEAPONS
+        self.hands.append(Launcher((15, 15), self.Player.pos, (58, 20), self.Projectile, scale= 0.2, offsetR=(20, 15), offsetL=(8, 40)))
         self.hands.append(Rifle((15, 15), self.Player.pos, (30, 15), self.Projectile, scale= 1.2, offsetR=(20, 25), offsetL=(2, 50)))
         self.hands.append(Pistol((15, 15), self.Player.pos, (10, 15), self.Projectile, scale= 1.2, offsetR=(30, 25), offsetL=(5, 30)))
         self.hand_idx = 0
         
         # self.enemies = []
-        # self.enemies = [Thug('Thug', (500,0), (24,54), self.assets, scale= 3.5, animations_offset=(-7, -2))]
-        # self.enemies = [Wizard('Wizard', (500,0), (40,73), self.assets, scale= 3, animations_offset=(-76, -71))]
+        # self.enemies = [Thug('Thug', (500,0), (24,54), self.assets, scale= 2.5, animations_offset=(-35, -9))]
+        # self.enemies = [Wizard('Wizard', (500,0), (40,53), self.assets, scale= 2.5, animations_offset=(-65, -67))]
         # self.enemies = [Skeleton('Skeleton',(500,0), (32,80), self.assets, scale= 3, animations_offset=(-78, -64))]
-        self.enemies = [Zombie('Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28))]
-        # for enemy in self.tilemap.extract([('Spawner', 2)], keep=False):
-        #     self.enemies.append(Skeleton('Skeleton', (enemy['pos'][0],enemy['pos'][1]), (32,80), self.assets, scale= 3, animations_offset=(-78, -64)))
+        self.enemies = [Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28))]
+        for enemy in self.tilemap.extract([('Spawner', 2)], keep=False):
+            self.enemies.append(Skeleton('Skeleton', (enemy['pos'][0],enemy['pos'][1]), (32,80), self.assets, scale= 3, animations_offset=(-78, -64)))
+
+        for enemy in self.tilemap.extract([('Spawner', 4)], keep=False):
+            self.enemies.append(Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28))) 
 
     def run(self):
         if self.state == "Main_Menu":
@@ -85,15 +88,6 @@ class Game:
             display.blit(pygame.transform.scale(
                 self.assets['BG'], (screen_w, screen_h)), (0, 0))
 
-            # Particles leaf random
-            for rect in self.Leaf_spawner:
-                if random.random() * 15000 < rect.width * rect.height:
-                    pos = (rect.x + random.random() * (rect.width + 64),
-                           rect.y + random.random() * (rect.height + 64))
-                    self.Particles.append(Particles(
-                        self.assets, 'leaf', pos, velocity=[-0.1, 0.3], frame=random.randint(0, 20)))
-            #
-
             # RENDER SCROLL
             self.scroll[0] += (self.Player.rect().centerx -
                                display.get_width()/2 - self.scroll[0]) / 30  # type: ignore
@@ -114,12 +108,16 @@ class Game:
                     self.Projectile.remove(i)
                 if self.tilemap.Tiles_around(i.pos, i.size):
                     self.Projectile.remove(i)
-                for ene in self.enemies.copy():
-                    if ene.rect().colliderect(i.rect()):
-                        ene.hurt(i.dame)
+                if i.owner == 'player':
+                    for ene in self.enemies.copy():
+                        if ene.rect().colliderect(i.rect()):
+                            ene.DMG(i.dame)
+                            self.Projectile.remove(i)
+                        if ene.Dead:
+                            self.enemies.remove(ene)
+                else:
+                    if self.Player.rect().colliderect(i.rect()):
                         self.Projectile.remove(i)
-                    if ene.Dead:
-                        self.enemies.remove(ene)
 
             self.tilemap.render(display, offset=render_scroll)
             self.Player.update(self.tilemap, offset=render_scroll)
@@ -136,12 +134,9 @@ class Game:
                 i.update(self.tilemap, self.Player)
                 i.render(display, offset=render_scroll)
 
-            # RENDERS PARTICLES LEAF
+            # PARTICLES HANDLER
             for Particle in self.Particles.copy():
                 kill = Particle.update()
-                if Particle.type == 'leaf':
-                    Particle.pos[0] += math.sin(
-                        Particle.animation.frame * (math.pi / 360)) * 0.3
                 Particle.render(display, offset=render_scroll)
                 if kill:
                     self.Particles.remove(Particle)

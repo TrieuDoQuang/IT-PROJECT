@@ -87,7 +87,7 @@ class Pistol(Weapon):
                 current = pygame.time.get_ticks()
                 if current - self.timer >= self.delay:
                     self.set_action('shoot')
-                    self.projectile.append(Projectile(game, 'small', (game.Player.rect().centerx ,game.Player.rect().centery - 15), self.flip, 8, (15, 10), self.angle, dame = self.dame, showtime= 100))
+                    self.projectile.append(Small_ammo(game, (game.Player.rect().centerx ,game.Player.rect().centery - 15), self.flip, 8, (15, 10), self.angle, dame = self.dame, showtime= 100))
                     self.ammo -= 1
                     self.timer = pygame.time.get_ticks()
 
@@ -106,7 +106,65 @@ class Rifle(Weapon):
                 current = pygame.time.get_ticks()
                 if current - self.timer >= self.delay:
                     self.set_action('shoot')
-                    self.projectile.append(Projectile(game, 'small', (game.Player.rect().centerx,game.Player.rect().centery - 5 ), self.flip, 8, (15, 10), self.angle, dame = self.dame, showtime= 150))
+                    self.projectile.append(Small_ammo(game, (game.Player.rect().centerx,game.Player.rect().centery - 10 ), self.flip, 8, (15, 10), self.angle, dame = self.dame, showtime= 150))
                     self.ammo -= 1
                     self.timer = pygame.time.get_ticks()
 
+class Launcher(Weapon):
+    def __init__(self, size, pos, pivot, projectile,  dame = 500, scale=1, offsetL=(0, 0), offsetR=(0, 0), delay= 1500, ammo=50):
+        super().__init__('launcher', size, pos, pivot, projectile, dame, scale, offsetL, offsetR, delay, ammo)
+    
+    def update(self, offset, player):
+        super().update(offset, player)
+        if self.action == 'shoot' and self.animation.done:
+            self.set_action('idle')
+    
+    def attack(self, game):
+        if self.ammo:
+            if not game.Player.is_dash and not game.Player.Wall_slide:
+                current = pygame.time.get_ticks()
+                if current - self.timer >= self.delay:
+                    self.set_action('shoot')
+                    self.projectile.append(Rocket_ammo(game, (game.Player.rect().centerx,game.Player.rect().centery - 12), self.flip, 8, (20, 12), self.angle, dame = self.dame, showtime= 120, scale=0.4))
+                    self.ammo -= 1
+                    self.timer = pygame.time.get_ticks()
+
+class Wep_Ene:
+    def __init__(self, type, Loffset = (0,0), Roffset=(0,0), scale = 1, delay = 1000, dame = 10):
+        self.type = type
+        self.action = ''
+        self.Loffset = Loffset
+        self.Roffset = Roffset
+        self.set_action('idle')
+        self.scale = scale
+        self.dame = dame
+        self.delay = delay
+        self.timer = pygame.time.get_ticks()
+    
+    def set_action(self, action):
+        if action != self.action:
+            self.action = action
+            self.animation = Assets[self.type + '/' + self.action].copy()
+    
+    def attack(self, game, ene):
+        current = pygame.time.get_ticks()
+        if current - self.timer >= self.delay:
+            self.timer = pygame.time.get_ticks()
+            self.set_action('shoot')
+            game.Projectile.append(Small_Ene_ammo(game, (ene.rect().centerx, ene.rect().centery), -1 if ene.flip else 1, 8, (15, 10), 0, dame = self.dame, showtime= 100))
+
+    def update(self, rect, flip):
+        if flip:
+            self.pos = [rect.centerx - self.Loffset[0], rect.centery -self.Loffset[1]]
+        else:
+            self.pos = [rect.centerx - self.Roffset[0], rect.centery -self.Roffset[1]]
+
+        if self.action == 'shoot':
+            if self.animation.done:
+                self.set_action('idle')
+        self.animation.update()
+
+    def render(self, surf, flip, offset=(0,0)):
+        img = self.animation.IMG()
+        img2 = pygame.transform.scale(img, (img.get_width() * self.scale, img.get_height() * self.scale))
+        surf.blit(pygame.transform.flip(img2, flip, False),(self.pos[0] - offset[0], self.pos[1] -  offset[1]))

@@ -14,7 +14,7 @@ Assets = {
     'decor': [Load_IMGS('tiles/decor'), 2],
     'large_decor': [Load_IMGS('tiles/large_decor'), 3],
     # Particles
-    'Particles/leaf': Animation(Load_IMGS('particles/leaf'), dur=10, loop=False),
+    'Particles/leaf': Animation(Load_IMGS('particles/leaf'), dur=15, loop=False),
     'Particles/particle': Animation(Load_IMGS('particles/particle'), dur=10, loop=False),
     # PLAYER ANIMS
     'Player/idle': Animation(Load_IMGS('entities/player/idle'), dur=13),
@@ -32,13 +32,15 @@ Assets = {
     # Skeleton
     'Skeleton/idle': Animation(Load_IMGS('entities/enemies/skeleton/idle'), dur=10),
     'Skeleton/run': Animation(Load_IMGS('entities/enemies/skeleton/run'), dur=10),
-    'Skeleton/attack': Animation(Load_IMGS('entities/enemies/skeleton/attack'), dur=10),
+    'Skeleton/attack': Animation(Load_IMGS('entities/enemies/skeleton/attack'), dur=10, loop=False),
     # Thug
     'Thug/idle': Animation(Load_IMGS('entities/enemies/thug/idle'), dur=13),
     'Thug/run': Animation(Load_IMGS('entities/enemies/thug/run'), dur=10),
+    'Thug/attack': Animation(Load_IMGS('entities/enemies/thug/attack'), dur=10, loop=False),
     # Wizard
     'Wizard/idle': Animation(Load_IMGS('entities/enemies/wizard/idle'), dur=13),
     'Wizard/run': Animation(Load_IMGS('entities/enemies/wizard/run'), dur=10),
+    'Wizard/attack': Animation(Load_IMGS('entities/enemies/wizard/attack'), dur=10, loop=False),
     # Zombie
     'Zombie/idle': Animation(Load_IMGS('entities/enemies/zombie/idle'), dur=13),
     'Zombie/run': Animation(Load_IMGS('entities/enemies/zombie/run'), dur=7),
@@ -48,8 +50,11 @@ Assets = {
     'pistol/shoot': Animation(Load_IMGS('weapons/pistol/shoot'), dur= 3, loop= False),
     'rifle/idle': Animation(Load_IMGS('weapons/rifle/idle')),
     'rifle/shoot': Animation(Load_IMGS('weapons/rifle/shoot'), dur= 1, loop= False),
+    'launcher/idle': Animation(Load_IMGS('weapons/launcher/idle')),
+    'launcher/shoot': Animation(Load_IMGS('weapons/launcher/shoot'), dur= 1, loop= False),
     'weapons/M15': Load_IMG('weapons/M15.png'),
 
     #BOOLETS
-    'bullet/small': Load_IMG('weapons/PistolAmmoBig.png')
+    'bullet/small': Load_IMG('weapons/PistolAmmoBig.png'),
+    'bullet/rocket': Load_IMG('weapons/rocket.png'),
 }
