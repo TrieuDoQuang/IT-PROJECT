@@ -17,8 +17,8 @@ AUTO_MAP = {
 
 NEIGHBOR_OFFSET = [(-1, 0), (-1, -1), (-1, 1), (0, 0),
                    (0, -1), (0, 1), (1, 0), (1, -1), (1, 1)]
-PHYSICS_TILES = {'grass', 'stone', 'dirt'}
-AUTO_TILES = {'grass', 'stone', 'dirt'}
+PHYSICS_TILES = {'grass', 'stone', 'dirt', 'modular', 'leaf', 'grass2'}
+AUTO_TILES = {'grass', 'stone', 'dirt', 'grass2'}
 
 
 class Tilemap:

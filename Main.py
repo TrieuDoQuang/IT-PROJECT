@@ -106,18 +106,19 @@ class Game:
                 i.render(display, offset = render_scroll)
                 if i.kill:
                     self.Projectile.remove(i)
-                if self.tilemap.Tiles_around(i.pos, i.size):
+                elif self.tilemap.Tiles_around(i.pos, i.size):
                     self.Projectile.remove(i)
-                if i.owner == 'player':
-                    for ene in self.enemies.copy():
-                        if ene.rect().colliderect(i.rect()):
-                            ene.DMG(i.dame)
-                            self.Projectile.remove(i)
-                        if ene.Dead:
-                            self.enemies.remove(ene)
                 else:
-                    if self.Player.rect().colliderect(i.rect()):
-                        self.Projectile.remove(i)
+                    if i.owner == 'player':
+                        for ene in self.enemies.copy():
+                            if ene.rect().colliderect(i.rect()):
+                                ene.DMG(i.dame)
+                                self.Projectile.remove(i)
+                            if ene.Dead:
+                                self.enemies.remove(ene)
+                    else:
+                        if self.Player.rect().colliderect(i.rect()):
+                            self.Projectile.remove(i)
 
             self.tilemap.render(display, offset=render_scroll)
             self.Player.update(self.tilemap, offset=render_scroll)

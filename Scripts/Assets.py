@@ -10,7 +10,10 @@ Assets = {
     'Clouds': Load_IMGS('clouds'),
     'stone': [Load_IMGS('tiles/stone'), 2],
     'dirt': [Load_IMGS('tiles/dirt'), 2],
+    'modular': [Load_IMGS('tiles/modular'), 2],
+    'leaf': [Load_IMGS('tiles/leaf'), 1],
     'grass': [Load_IMGS('tiles/grass'), 2],
+    'grass2': [Load_IMGS('tiles/grass2'), 2],
     'decor': [Load_IMGS('tiles/decor'), 2],
     'large_decor': [Load_IMGS('tiles/large_decor'), 3],
     # Particles
