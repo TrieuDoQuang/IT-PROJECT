@@ -21,7 +21,6 @@ class Projectile:
         self.flip = False
         self.scale = scale
         self.explosion = explosion
-        self.part_check = False
     
     def update(self):
         self.current_time = pygame.time.get_ticks()
@@ -30,10 +29,6 @@ class Projectile:
         self.dir = pygame.Vector2(self.vel, dy)
         if self.dir.magnitude():
             self.dir = pygame.Vector2.normalize(self.dir)
-
-        if not self.part_check:
-            self.game.Particles.append(Smoke_Trail(self.game, self.pos, self.dir, 4, 0.5, self.kill, self.size))
-            self.part_check = True
 
         self.dir *= self.speed
         self.pos[0] += self.dir[0]
@@ -63,6 +58,13 @@ class Projectile:
 class Rocket_ammo(Projectile):
     def __init__(self, game, pos, vel, speed, size, angle, owner='player', dame=10, showtime=250, scale=1):
         super().__init__(game, 'rocket' , pos, vel, speed, size, angle, owner, dame, showtime, scale, explosion=True)
+        self.part_check = False
+    
+    def update(self):
+        super().update()
+        if not self.part_check:
+            self.game.Particles.append(Smoke_Trail(self.game, self.pos, self.dir, 4, 0.5, self.kill, self.size))
+            self.part_check = True
 
 class Small_ammo(Projectile):
     def __init__(self, game, pos, vel, speed, size, angle, owner='player', dame=10, showtime=250, scale=1):

@@ -11,6 +11,7 @@ from Scripts.Particles import *
 from Scripts.Enemies import *
 from Scripts.Weapons import *
 from Scripts.Explosion import *
+from Scripts.Drops import DropHandler
 
 class Game:
     def __init__(self):
@@ -51,6 +52,9 @@ class Game:
             self.Player.pos[0] = ply['pos'][0]
             self.Player.pos[1] = ply['pos'][1]
         
+        #DROPS
+        self.Drops = []
+        
         #WEAPONS
         self.hands.append(Launcher((15, 15), self.Player.pos, (58, 20), self.Projectile, scale= 0.2, offsetR=(20, 15), offsetL=(8, 35)))
         self.hands.append(Rifle((15, 15), self.Player.pos, (30, 15), self.Projectile, scale= 1.2, offsetR=(20, 25), offsetL=(2, 50)))
@@ -90,8 +94,8 @@ class Game:
             #     self.End = True
 
             # BACK_GROUND
-            display.blit(pygame.transform.scale(
-                self.assets['BG'], (screen_w, screen_h)), (0, 0))
+            # display.blit(pygame.transform.scale(self.assets['BG'], (screen_w, screen_h)), (0, 0))
+            display.blit(pygame.transform.scale(pygame.Surface((screen_w, screen_h)), (screen_w, screen_h)), (0, 0))
 
             # RENDER SCROLL
             self.scroll[0] += (self.Player.rect().centerx - display.get_width()/2 - self.scroll[0]) / 30   # type: ignore
@@ -104,10 +108,8 @@ class Game:
 
             self.tilemap.render(display, offset=render_scroll)
             self.Player.update(self.tilemap, offset=render_scroll)
-            self.Player.render(display, offset=render_scroll)
 
             # HAND HANDLER
-            self.hands[self.hand_idx].render(display, player= self.Player, offset=render_scroll)
             self.hands[self.hand_idx].update(offset=render_scroll, player=self.Player)
             if click:
                 self.hands[self.hand_idx].attack(self)
@@ -119,6 +121,15 @@ class Game:
                 if i.Dead:
                     self.enemies.remove(i)
                     self.Particles.append(Blood_explode(self, i.pos, 5, 0.05, 15))
+                    DropHandler(self, i.pos)
+            
+            #DROP HANDLER
+            for i in self.Drops.copy():
+                i.update()
+                i.render(display, offset=render_scroll)
+                if i.rect().colliderect(self.Player.rect()):
+                    i.function()
+                    self.Drops.remove(i)
 
             # PARTICLES HANDLER
             for Particle in sorted(self.Particles.copy(), key= lambda x: x.amounts):
@@ -134,6 +145,7 @@ class Game:
                 if i.kill[0]:
                     if i.explosion:
                         self.explosion.append(Explosion(i.rect().center, (200, 200), i.dame, 'Player'))
+                        self.Particles.append(Smoke_explode(self, i.rect().center, 4, 0.5, 20))
                     self.Projectile.remove(i)
                     continue
                 elif self.tilemap.Tiles_around(i.pos, i.size):
@@ -152,7 +164,7 @@ class Game:
                                     self.explosion.append(Explosion(i.pos, (200, 200), i.dame, 'Player'))
                                     self.Particles.append(Smoke_explode(self, i.rect().center, 4, 0.5, 20))
                                 else:
-                                    self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 10, 0.05, 5 ))
+                                    self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 10, 0.05, 3 ))
                                 i.kill[0] = True
                                 self.Projectile.remove(i)
                                 break
@@ -161,10 +173,14 @@ class Game:
                             if i.explosion:
                                 self.explosion.append(Explosion(i.pos, (200, 200), i.dame, 'Ene'))
                             else:
-                                self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 6, 0.05, 5 ))
+                                self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 6, 0.05, 3 ))
                             i.kill[0] = True
                             self.Projectile.remove(i)
                             continue
+            
+            # PLAYER AND HAND RENDER
+            self.Player.render(display, offset=render_scroll)
+            self.hands[self.hand_idx].render(display, player= self.Player, offset=render_scroll)
 
             for i in self.explosion.copy():
                 for ene in self.enemies.copy():
