@@ -19,7 +19,9 @@ Assets = {
     # Particles
     'Particles/leaf': Animation(Load_IMGS('particles/leaf'), dur=15, loop=False),
     'Particles/particle': Animation(Load_IMGS('particles/particle'), dur=10, loop=False),
+
     # PLAYER ANIMS
+    'Cursor' : Load_IMG('entities/player/cursor.png'),
     'Player/idle': Animation(Load_IMGS('entities/player/idle'), dur=13),
     'Player/jump': Animation(Load_IMGS('entities/player/jump'), dur=13, loop=False),
     'Player/run': Animation(Load_IMGS('entities/player/run')),
@@ -55,9 +57,8 @@ Assets = {
     'rifle/shoot': Animation(Load_IMGS('weapons/rifle/shoot'), dur= 1, loop= False),
     'launcher/idle': Animation(Load_IMGS('weapons/launcher/idle')),
     'launcher/shoot': Animation(Load_IMGS('weapons/launcher/shoot'), dur= 1, loop= False),
-    'weapons/M15': Load_IMG('weapons/M15.png'),
 
     #BOOLETS
-    'bullet/small': Load_IMG('weapons/PistolAmmoBig.png'),
-    'bullet/rocket': Load_IMG('weapons/rocket.png'),
+    'bullet/small': Load_IMG('weapons/bullets/PistolAmmoBig.png'),
+    'bullet/rocket': Load_IMG('weapons/bullets/rocket.png'),
 }

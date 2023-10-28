@@ -1,8 +1,9 @@
-import pygame, math
+import pygame, math, copy
 from Scripts.Assets import Assets
+from Scripts.Particles import Smoke_Trail
 
 class Projectile:
-    def __init__(self, game, type, pos, vel, speed, size, angle, owner = 'player', dame = 10, showtime = 250, scale = 1):
+    def __init__(self, game, type, pos, vel, speed, size, angle, owner = 'player', dame = 10, showtime = 250, scale = 1, explosion = False):
         self.type = type
         self.game = game
         self.pos = list(pos)
@@ -15,21 +16,28 @@ class Projectile:
         self.size = size
         self.alive_time = 2000
         self.timer = pygame.time.get_ticks()
-        self.kill = False
+        self.kill = [False]
         self.showtime = showtime
         self.flip = False
         self.scale = scale
+        self.explosion = explosion
+        self.part_check = False
     
     def update(self):
         self.current_time = pygame.time.get_ticks()
         rad = math.radians(self.angle)
         dy = - math.tan(rad) * self.vel
-        dir = pygame.Vector2(self.vel, dy)
-        if dir.magnitude():
-            dir = pygame.Vector2.normalize(dir)
-        dir *= self.speed
-        self.pos[0] += dir[0]
-        self.pos[1] += dir[1]
+        self.dir = pygame.Vector2(self.vel, dy)
+        if self.dir.magnitude():
+            self.dir = pygame.Vector2.normalize(self.dir)
+
+        if not self.part_check:
+            self.game.Particles.append(Smoke_Trail(self.game, self.pos, self.dir, 4, 0.5, self.kill, self.size))
+            self.part_check = True
+
+        self.dir *= self.speed
+        self.pos[0] += self.dir[0]
+        self.pos[1] += self.dir[1]
         self.flip = False
         if self.vel < 0:
             self.flip = True
@@ -40,7 +48,7 @@ class Projectile:
 
     def destroy(self):
         if self.current_time - self.timer >= self.alive_time:
-            self.kill = True
+            self.kill[0] = True
 
     def render(self, surf, offset = (0,0)):
         if self.current_time - self.timer >= self.showtime:
@@ -54,7 +62,7 @@ class Projectile:
 
 class Rocket_ammo(Projectile):
     def __init__(self, game, pos, vel, speed, size, angle, owner='player', dame=10, showtime=250, scale=1):
-        super().__init__(game, 'rocket' , pos, vel, speed, size, angle, owner, dame, showtime, scale)
+        super().__init__(game, 'rocket' , pos, vel, speed, size, angle, owner, dame, showtime, scale, explosion=True)
 
 class Small_ammo(Projectile):
     def __init__(self, game, pos, vel, speed, size, angle, owner='player', dame=10, showtime=250, scale=1):

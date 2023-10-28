@@ -10,6 +10,7 @@ from Scripts.Tilemap import Tilemap
 from Scripts.Particles import *
 from Scripts.Enemies import *
 from Scripts.Weapons import *
+from Scripts.Explosion import *
 
 class Game:
     def __init__(self):
@@ -31,12 +32,14 @@ class Game:
             pass
         self.temp = 1
 
-        # Particles
-        self.Particles = []
-
         # Projectiles
         self.Projectile = []
 
+        # Explosion
+        self.explosion = []
+
+        # Particles
+        self.Particles = []
         self.Leaf_spawner = []
         for tree in self.tilemap.extract([('large_decor', 2)], True):
             self.Leaf_spawner.append(pygame.Rect(tree['pos'][0] + 4, tree['pos'][1] + 4, 23, 13))
@@ -49,7 +52,7 @@ class Game:
             self.Player.pos[1] = ply['pos'][1]
         
         #WEAPONS
-        self.hands.append(Launcher((15, 15), self.Player.pos, (58, 20), self.Projectile, scale= 0.2, offsetR=(20, 15), offsetL=(8, 40)))
+        self.hands.append(Launcher((15, 15), self.Player.pos, (58, 20), self.Projectile, scale= 0.2, offsetR=(20, 15), offsetL=(8, 35)))
         self.hands.append(Rifle((15, 15), self.Player.pos, (30, 15), self.Projectile, scale= 1.2, offsetR=(20, 25), offsetL=(2, 50)))
         self.hands.append(Pistol((15, 15), self.Player.pos, (10, 15), self.Projectile, scale= 1.2, offsetR=(30, 25), offsetL=(5, 30)))
         self.hand_idx = 0
@@ -59,6 +62,8 @@ class Game:
         # self.enemies = [Wizard('Wizard', (500,0), (40,53), self.assets, scale= 2.5, animations_offset=(-65, -67))]
         # self.enemies = [Skeleton('Skeleton',(500,0), (32,80), self.assets, scale= 3, animations_offset=(-78, -64))]
         self.enemies = [Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28))]
+        self.enemies.append(Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28)))
+        self.enemies.append(Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28)))
         for enemy in self.tilemap.extract([('Spawner', 2)], keep=False):
             self.enemies.append(Skeleton('Skeleton', (enemy['pos'][0],enemy['pos'][1]), (32,80), self.assets, scale= 3, animations_offset=(-78, -64)))
 
@@ -89,36 +94,13 @@ class Game:
                 self.assets['BG'], (screen_w, screen_h)), (0, 0))
 
             # RENDER SCROLL
-            self.scroll[0] += (self.Player.rect().centerx -
-                               display.get_width()/2 - self.scroll[0]) / 30  # type: ignore
-            self.scroll[1] += (self.Player.rect().centery -
-                               display.get_height()/2 - self.scroll[1]) / 20  # type: ignore
+            self.scroll[0] += (self.Player.rect().centerx - display.get_width()/2 - self.scroll[0]) / 30   # type: ignore
+            self.scroll[1] += (self.Player.rect().centery - display.get_height()/2 - self.scroll[1]) / 20  # type: ignore
             render_scroll = (int(self.scroll[0]), int(self.scroll[1]))
-
 
             # RENDERS
             self.Clouds.render(display, offset=render_scroll)
             self.Clouds.update()
-
-            # PROJECTILE HANDLER
-            for i in self.Projectile.copy():
-                i.update()
-                i.render(display, offset = render_scroll)
-                if i.kill:
-                    self.Projectile.remove(i)
-                elif self.tilemap.Tiles_around(i.pos, i.size):
-                    self.Projectile.remove(i)
-                else:
-                    if i.owner == 'player':
-                        for ene in self.enemies.copy():
-                            if ene.rect().colliderect(i.rect()):
-                                ene.DMG(i.dame)
-                                self.Projectile.remove(i)
-                            if ene.Dead:
-                                self.enemies.remove(ene)
-                    else:
-                        if self.Player.rect().colliderect(i.rect()):
-                            self.Projectile.remove(i)
 
             self.tilemap.render(display, offset=render_scroll)
             self.Player.update(self.tilemap, offset=render_scroll)
@@ -134,13 +116,63 @@ class Game:
             for i in self.enemies.copy():
                 i.update(self.tilemap, self.Player)
                 i.render(display, offset=render_scroll)
+                if i.Dead:
+                    self.enemies.remove(i)
+                    self.Particles.append(Blood_explode(self, i.pos, 5, 0.05, 15))
 
             # PARTICLES HANDLER
-            for Particle in self.Particles.copy():
+            for Particle in sorted(self.Particles.copy(), key= lambda x: x.amounts):
                 kill = Particle.update()
                 Particle.render(display, offset=render_scroll)
                 if kill:
                     self.Particles.remove(Particle)
+            
+            # PROJECTILE HANDLER
+            for i in self.Projectile.copy():
+                i.update()
+                i.render(display, offset = render_scroll)
+                if i.kill[0]:
+                    if i.explosion:
+                        self.explosion.append(Explosion(i.rect().center, (200, 200), i.dame, 'Player'))
+                    self.Projectile.remove(i)
+                    continue
+                elif self.tilemap.Tiles_around(i.pos, i.size):
+                    if i.explosion:
+                        self.explosion.append(Explosion(i.pos, (200, 200), i.dame, 'Player'))
+                        self.Particles.append(Smoke_explode(self, i.rect().center, 4, 0.5, 20))
+                    i.kill[0] = True
+                    self.Projectile.remove(i)
+                    continue
+                else:
+                    if i.owner == 'player':
+                        for ene in self.enemies.copy():
+                            if ene.rect().colliderect(i.rect()):
+                                ene.DMG(i.dame)
+                                if i.explosion:
+                                    self.explosion.append(Explosion(i.pos, (200, 200), i.dame, 'Player'))
+                                    self.Particles.append(Smoke_explode(self, i.rect().center, 4, 0.5, 20))
+                                else:
+                                    self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 10, 0.05, 5 ))
+                                i.kill[0] = True
+                                self.Projectile.remove(i)
+                                break
+                    else:
+                        if self.Player.rect().colliderect(i.rect()):
+                            if i.explosion:
+                                self.explosion.append(Explosion(i.pos, (200, 200), i.dame, 'Ene'))
+                            else:
+                                self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 6, 0.05, 5 ))
+                            i.kill[0] = True
+                            self.Projectile.remove(i)
+                            continue
+
+            for i in self.explosion.copy():
+                for ene in self.enemies.copy():
+                    if ene.rect().colliderect(i.rect()):
+                        ene.DMG(i.dame)
+                self.explosion.remove(i)
+            
+            self.cursor_render()
 
             # TRANSITION
             if not self.temp:
@@ -158,6 +190,14 @@ class Game:
         elif self.state == "Quit":
             pygame.quit()
             sys.exit()
+    
+    def cursor_render(self):
+        pygame.mouse.set_visible(False)
+        mouse_pos = pygame.mouse.get_pos()
+        img = self.assets['Cursor']
+        img2 = pygame.transform.scale(img, (img.get_width() * 3, img.get_height() * 3))
+        rect = img2.get_rect(center = mouse_pos)
+        display.blit(img2, rect)
 
 
 if __name__ == '__main__':

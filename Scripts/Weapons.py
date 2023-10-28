@@ -125,7 +125,7 @@ class Launcher(Weapon):
                 current = pygame.time.get_ticks()
                 if current - self.timer >= self.delay:
                     self.set_action('shoot')
-                    self.projectile.append(Rocket_ammo(game, (game.Player.rect().centerx,game.Player.rect().centery - 12), self.flip, 8, (20, 12), self.angle, dame = self.dame, showtime= 120, scale=0.4))
+                    self.projectile.append(Rocket_ammo(game, (game.Player.rect().centerx - 5,game.Player.rect().centery - 10), self.flip, 8, (20, 12), self.angle, dame = self.dame, showtime= 120, scale=0.4))
                     self.ammo -= 1
                     self.timer = pygame.time.get_ticks()
 
