@@ -19,9 +19,12 @@ Assets = {
     # Particles
     'Particles/leaf': Animation(Load_IMGS('particles/leaf'), dur=15, loop=False),
     'Particles/particle': Animation(Load_IMGS('particles/particle'), dur=10, loop=False),
-
+    'Drops/ammo_pistol': Animation(Load_IMGS('drops/ammo_pistol'), dur=5, loop=False),
+    'Drops/health': Animation(Load_IMGS('drops/health'), dur=5, loop=False),
+    'Drops/ammo_rifle': Animation(Load_IMGS('drops/ammo_rifle'), dur=5, loop=False),
+    'Drops/rocket': Animation(Load_IMGS('drops/rocket'), dur=5, loop=False),
     # PLAYER ANIMS
-    'Cursor' : Load_IMG('entities/player/cursor.png'),
+    'Cursor': Load_IMG('entities/player/cursor.png'),
     'Player/idle': Animation(Load_IMGS('entities/player/idle'), dur=13),
     'Player/jump': Animation(Load_IMGS('entities/player/jump'), dur=13, loop=False),
     'Player/run': Animation(Load_IMGS('entities/player/run')),
@@ -50,15 +53,15 @@ Assets = {
     'Zombie/idle': Animation(Load_IMGS('entities/enemies/zombie/idle'), dur=13),
     'Zombie/run': Animation(Load_IMGS('entities/enemies/zombie/run'), dur=7),
 
-    #WEAPONS
+    # WEAPONS
     'pistol/idle': Animation(Load_IMGS('weapons/pistol/idle')),
-    'pistol/shoot': Animation(Load_IMGS('weapons/pistol/shoot'), dur= 3, loop= False),
+    'pistol/shoot': Animation(Load_IMGS('weapons/pistol/shoot'), dur=3, loop=False),
     'rifle/idle': Animation(Load_IMGS('weapons/rifle/idle')),
-    'rifle/shoot': Animation(Load_IMGS('weapons/rifle/shoot'), dur= 1, loop= False),
+    'rifle/shoot': Animation(Load_IMGS('weapons/rifle/shoot'), dur=1, loop=False),
     'launcher/idle': Animation(Load_IMGS('weapons/launcher/idle')),
-    'launcher/shoot': Animation(Load_IMGS('weapons/launcher/shoot'), dur= 1, loop= False),
+    'launcher/shoot': Animation(Load_IMGS('weapons/launcher/shoot'), dur=1, loop=False),
 
-    #BOOLETS
+    # BOOLETS
     'bullet/small': Load_IMG('weapons/bullets/PistolAmmoBig.png'),
     'bullet/rocket': Load_IMG('weapons/bullets/rocket.png'),
 }
