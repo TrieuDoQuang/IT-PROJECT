@@ -1,15 +1,19 @@
 from Scripts.Entities import *
 from Scripts.Weapons import Wep_Ene
+from Scripts.Particles import Earth_Cols
 import pygame, random
 
 class Skeleton(PhysicsEntity):
-    def __init__(self, e_type, pos, size, assets, Health = 250, speed=1.5, scale = 1, animations_offset=(0, 0)):
+    def __init__(self, game, e_type, pos, size, assets, Health = 250, speed=1.5, scale = 1, animations_offset=(0, 0)):
         super().__init__(e_type, pos, size, assets, Health, speed)
         self.scale = scale
         self.animations_offset = animations_offset
         self.walking = 0
         self.Air_time = 0
+        self.game = game
         self.attacking = False
+        self.delay = 900
+        self.timer = pygame.time.get_ticks()
 
     def walk(self, tilemap):
         if not self.walking:
@@ -23,10 +27,19 @@ class Skeleton(PhysicsEntity):
     
     def attack(self):
         self.walking = 0
-        self.set_action('attack')
         self.attacking = True
-
+        self.Earth()
+        self.set_action('attack')
     
+    def Earth(self):
+        if self.attacking:
+            current = pygame.time.get_ticks()
+            if self.action != 'attack':
+                self.timer = pygame.time.get_ticks()
+            if current - self.timer >= self.delay:
+                self.game.Particles.append(Earth_Cols(self.game, (30, 75), self.rect(), -1 if self.flip else 1, 5))
+                self.timer = pygame.time.get_ticks()
+
     def update(self, tilemap, player):
         super().update(tilemap)
         self.Air_time += 1
@@ -42,14 +55,14 @@ class Skeleton(PhysicsEntity):
             if self.Air_time < 1:
                 self.walk(tilemap)
 
-        if self.action != 'attack':
-            if abs(player.rect().x - self.rect().x) < 90:
-                if self.rect().x - player.rect().x > 0:
-                    self.flip = True
-                if self.rect().x - player.rect().x < 0:
-                    self.flip = False
-                self.attack()
+        if abs(player.rect().x - self.rect().x) < 150:
+            if self.rect().x - player.rect().x > 0:
+                 self.flip = True
+            if self.rect().x - player.rect().x < 0:
+                self.flip = False
+            self.attack()
 
+        self.Earth()
         if self.action == 'idle' and self.Air_time < 1:
                 chance = random.randint(0, 100)
                 if chance < 10:

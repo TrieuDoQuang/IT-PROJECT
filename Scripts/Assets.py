@@ -19,6 +19,7 @@ Assets = {
     # Particles
     'Particles/leaf': Animation(Load_IMGS('particles/leaf'), dur=15, loop=False),
     'Particles/particle': Animation(Load_IMGS('particles/particle'), dur=10, loop=False),
+    'Particles/earthwall': Animation(Load_IMGS('particles/earthwall'), dur=2, loop=False),
 
     # PLAYER ANIMS
     'Cursor' : Load_IMG('entities/player/cursor.png'),

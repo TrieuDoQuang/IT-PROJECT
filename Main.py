@@ -64,12 +64,12 @@ class Game:
         # self.enemies = []
         # self.enemies = [Thug('Thug', (500,0), (24,54), self.assets, scale= 2.5, animations_offset=(-35, -9))]
         # self.enemies = [Wizard('Wizard', (500,0), (40,53), self.assets, scale= 2.5, animations_offset=(-65, -67))]
-        # self.enemies = [Skeleton('Skeleton',(500,0), (32,80), self.assets, scale= 3, animations_offset=(-78, -64))]
-        self.enemies = [Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28))]
-        self.enemies.append(Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28)))
-        self.enemies.append(Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28)))
+        self.enemies = [Skeleton(self, 'Skeleton',(500,0), (32,80), self.assets, scale= 3, animations_offset=(-78, -64))]
+        # self.enemies = [Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28))]
+        # self.enemies.append(Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28)))
+        # self.enemies.append(Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28)))
         for enemy in self.tilemap.extract([('Spawner', 2)], keep=False):
-            self.enemies.append(Skeleton('Skeleton', (enemy['pos'][0],enemy['pos'][1]), (32,80), self.assets, scale= 3, animations_offset=(-78, -64)))
+            self.enemies.append(Skeleton(self, 'Skeleton', (enemy['pos'][0],enemy['pos'][1]), (32,80), self.assets, scale= 3, animations_offset=(-78, -64)))
 
         for enemy in self.tilemap.extract([('Spawner', 4)], keep=False):
             self.enemies.append(Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28))) 
@@ -94,8 +94,8 @@ class Game:
             #     self.End = True
 
             # BACK_GROUND
-            # display.blit(pygame.transform.scale(self.assets['BG'], (screen_w, screen_h)), (0, 0))
-            display.blit(pygame.transform.scale(pygame.Surface((screen_w, screen_h)), (screen_w, screen_h)), (0, 0))
+            display.blit(pygame.transform.scale(self.assets['BG'], (screen_w, screen_h)), (0, 0))
+            # display.blit(pygame.transform.scale(pygame.Surface((screen_w, screen_h)), (screen_w, screen_h)), (0, 0))
 
             # RENDER SCROLL
             self.scroll[0] += (self.Player.rect().centerx - display.get_width()/2 - self.scroll[0]) / 30   # type: ignore
@@ -163,8 +163,7 @@ class Game:
                                 if i.explosion:
                                     self.explosion.append(Explosion(i.pos, (200, 200), i.dame, 'Player'))
                                     self.Particles.append(Smoke_explode(self, i.rect().center, 4, 0.5, 20))
-                                else:
-                                    self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 10, 0.05, 3 ))
+                                self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 10, 0.05, 3 ))
                                 i.kill[0] = True
                                 self.Projectile.remove(i)
                                 break
@@ -172,8 +171,7 @@ class Game:
                         if self.Player.rect().colliderect(i.rect()):
                             if i.explosion:
                                 self.explosion.append(Explosion(i.pos, (200, 200), i.dame, 'Ene'))
-                            else:
-                                self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 6, 0.05, 3 ))
+                            self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 6, 0.05, 3 ))
                             i.kill[0] = True
                             self.Projectile.remove(i)
                             continue

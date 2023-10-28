@@ -22,7 +22,7 @@ class Drop:
     def set_action(self, action):
         if action != self.action:
             self.action = action
-            self.animation = self.assets[self.type + '/' + self.action].copy()
+            self.animation = self.game.assets[self.type + '/' + self.action].copy()
 
     def render(self, surf, offset):
         img = self.animation.IMG()

@@ -27,7 +27,7 @@ class Weapon:
     
     def attack(self, game):
         pass
-    
+   
     def set_action(self, action):
         if action != self.action:
             self.action = action

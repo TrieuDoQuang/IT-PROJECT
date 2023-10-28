@@ -296,3 +296,71 @@ class Blood_explode:
     def render(self, surf, offset):
         for i in sorted(self.parts, key= lambda i:i.size):
             i.render(surf, offset)
+
+class Earth_coll:
+    def __init__(self, game, pos, size, scale = 1, flip = False):
+        self.game = game
+        self.pos = pos
+        self.action = ''
+        self.set_action('earthwall')
+        self.done = False
+        self.size = size
+        self.rect2 = self.rect()
+        self.scale = scale
+        self.flip = flip
+    
+    def set_action(self, action):
+        if action != self.action:
+            self.action = action
+            self.animation = self.game.assets['Particles/' + self.action].copy()
+    
+    def update(self):
+        self.animation.update()
+        if self.animation.done:
+            self.done = True
+    
+    def rect(self):
+        surf = pygame.Surface(self.size)
+        return surf.get_rect(midbottom = self.pos)
+
+    def render(self, surf, offset):
+        img = self.animation.IMG()
+        img2 = pygame.transform.scale(img, (img.get_width() * self.scale, img.get_height() * self.scale))
+        surf.blit(pygame.transform.flip(img2, self.flip, False), (self.rect2.x - offset[0] - 40, self.rect2.y - offset[1]))
+        # surf2 = pygame.Surface(self.size)
+        # surf.blit(surf2, (self.rect2.x - offset[0], self.rect2.y - offset[1]))
+
+class Earth_Cols:
+    def __init__(self, game, size, rect, vel, amounts):
+        self.game = game
+        self.rect = rect
+        self.size = size
+        self.vel = vel
+        self.amounts = amounts
+        self.count = 0
+        self.parts = []
+        self.done = False
+    
+    def update(self):
+        if self.count <= self.amounts:
+            loco = list(self.rect.midbottom)
+            loco[0] += self.count * self.size[0] * self.vel
+            self.parts.append(Earth_coll(self.game, loco, self.size, scale=2, flip= True if self.vel < 0 else False))
+            self.count += 1
+
+        for i in self.parts.copy():
+            i.update()
+            if i.done:
+                self.parts.remove(i)
+            if i.rect().colliderect(self.game.Player.rect()):
+                self.game.Player.DMG(100)
+    
+        count2 =  len(self.parts)
+        if count2 == 0:
+            self.done = True
+            return True
+        return False
+    
+    def render(self, surf, offset):
+        for i in self.parts:
+            i.render(surf, offset)
