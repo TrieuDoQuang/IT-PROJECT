@@ -121,14 +121,17 @@ class Game:
                 if i.Dead:
                     self.enemies.remove(i)
                     self.Particles.append(Blood_explode(self, i.pos, 5, 0.05, 15))
+                    # print("before",self.hands[self.hand_idx].ammo, self.hands[self.hand_idx].type)
                     DropHandler(self, i.pos)
-            
+                    
             #DROP HANDLER
             for i in self.Drops.copy():
                 i.update()
                 i.render(display, offset=render_scroll)
                 if i.rect().colliderect(self.Player.rect()):
                     i.function()
+
+                    print("after", self.hands[self.hand_idx].type, " ", self.hands[self.hand_idx].ammo)
                     self.Drops.remove(i)
 
             # PARTICLES HANDLER
@@ -157,6 +160,7 @@ class Game:
                     continue
                 else:
                     if i.owner == 'player':
+                        print("before",self.hands[self.hand_idx].ammo, self.hands[self.hand_idx].type)
                         for ene in self.enemies.copy():
                             if ene.rect().colliderect(i.rect()):
                                 ene.DMG(i.dame)
@@ -179,7 +183,6 @@ class Game:
             # PLAYER AND HAND RENDER
             self.Player.render(display, offset=render_scroll)
             self.hands[self.hand_idx].render(display, player= self.Player, offset=render_scroll)
-
             for i in self.explosion.copy():
                 for ene in self.enemies.copy():
                     if ene.rect().colliderect(i.rect()):

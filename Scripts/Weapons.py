@@ -72,6 +72,9 @@ class Weapon:
             rotate_img, rotated_image_rect = self.rotate(player)
             surf.blit(rotate_img, (rotated_image_rect.x - offset[0], rotated_image_rect.y - offset[1]))
 
+    def addBullets(self, amount):
+        self.ammo += amount
+
 class Pistol(Weapon):
     def __init__(self, size, pos, pivot, projectile,  dame= 50, scale=1, offsetL=(0, 0), offsetR=(0, 0), delay= 1000, ammo=50):
         super().__init__('pistol', size, pos, pivot, projectile, dame, scale, offsetL, offsetR, delay, ammo)
@@ -90,7 +93,6 @@ class Pistol(Weapon):
                     self.projectile.append(Small_ammo(game, (game.Player.rect().centerx ,game.Player.rect().centery - 15), self.flip, 8, (15, 10), self.angle, dame = self.dame, showtime= 100))
                     self.ammo -= 1
                     self.timer = pygame.time.get_ticks()
-
 class Rifle(Weapon):
     def __init__(self, size, pos, pivot, projectile,  dame = 20, scale=1, offsetL=(0, 0), offsetR=(0, 0), delay= 400, ammo=50):
         super().__init__('rifle', size, pos, pivot, projectile, dame, scale, offsetL, offsetR, delay, ammo)

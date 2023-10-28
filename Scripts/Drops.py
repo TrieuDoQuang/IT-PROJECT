@@ -1,5 +1,5 @@
 import pygame, random
-
+from Scripts.Weapons import *
 class Drop:
     def __init__(self, game, pos, type, size, scale = 1):
         self.game = game
@@ -22,7 +22,7 @@ class Drop:
     def set_action(self, action):
         if action != self.action:
             self.action = action
-            self.animation = self.game.assets[self.type + '/' + self.action].copy()
+            self.animation = self.game.assets['Drops' + '/' + self.action].copy()
 
     def render(self, surf, offset):
         img = self.animation.IMG()
@@ -31,15 +31,57 @@ class Drop:
     
 def DropHandler(game, pos):
         chance = random.randint(0, 100)
-        if chance < 10:
-            choice2 = random.choice(['health', 'ammo_pistol'])
+        if chance < 100:
+            choice2 = random.choice(['health', 'ammo_pistol', 'rocket', 'ammo_rifle'])
             if choice2 == 'health':
                 game.Drops.append(Drop_Health(game, pos, (100, 100)))
-
+            if choice2 == 'ammo_pistol':
+                game.Drops.append(Ammo_Pistol(game, pos, (100,100)))
+            if choice2 == 'rocket':
+                game.Drops.append(Rocket(game, pos, (100,100)))
+            if choice2 == 'ammo_rifle':
+                game.Drops.append(Ammo_Rifle(game, pos, (100,100)))
 class Drop_Health(Drop):
     def __init__(self, game, pos, size, scale=1, amount = 100):
         super().__init__(game, pos, 'health', size, scale)
         self.amount = amount
     
     def function(self):
-        pass
+        self.game.Player.Heal(self.amount)
+
+class Ammo_Pistol(Drop):
+    def __init__(self, game, pos,  size, scale=1, amount = 10):
+        super().__init__(game, pos, 'ammo_pistol', size, scale)
+        self.amount = amount
+
+    def function(self):
+        len1 = len(self.game.hands)
+        for i in range (len1): 
+            if self.game.hands[i].type == "pistol":
+                self.game.hands[i].addBullets(self.amount)
+
+
+
+class Rocket(Drop):
+    def __init__(self, game, pos,  size, scale=1, amount = 10):
+        super().__init__(game, pos, 'rocket', size, scale)
+        self.amount = amount
+
+    def function(self):
+        len1 = len(self.game.hands)
+        for i in range (len1): 
+            if self.game.hands[i].type == "launcher":
+                self.game.hands[i].addBullets(self.amount)
+        
+
+
+class Ammo_Rifle(Drop):
+    def __init__(self, game, pos,  size, scale=1, amount = 10):
+        super().__init__(game, pos, 'ammo_rifle', size, scale)
+        self.amount = amount
+
+    def function(self):
+        len1 = len(self.game.hands)
+        for i in range (len1): 
+            if self.game.hands[i].type == "rifle":
+                self.game.hands[i].addBullets(self.amount)
