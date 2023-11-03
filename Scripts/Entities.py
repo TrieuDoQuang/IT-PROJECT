@@ -20,6 +20,7 @@ class PhysicsEntity():
 
         self.Dead = False
         self.Health = Health
+        self.Max_Health = Health
     
     def rect(self):
         return pygame.Rect(self.pos[0], self.pos[1], self.size[0], self.size[1])

@@ -27,7 +27,7 @@ Assets = {
     'Drops/rocket': Animation(Load_IMGS('drops/rocket'), dur=5, loop=False),
 
     # PLAYER ANIMS
-    'Cursor': Load_IMG('entities/player/cursor.png'),
+    'Cursor': Load_IMG('UI/cursor.png'),
     'Player/idle': Animation(Load_IMGS('entities/player/idle'), dur=13),
     'Player/jump': Animation(Load_IMGS('entities/player/jump'), dur=13, loop=False),
     'Player/run': Animation(Load_IMGS('entities/player/run')),
@@ -67,4 +67,11 @@ Assets = {
     # BOOLETS
     'bullet/small': Load_IMG('weapons/bullets/PistolAmmoBig.png'),
     'bullet/rocket': Load_IMG('weapons/bullets/rocket.png'),
+    'bullet/fireball': Animation(Load_IMGS('particles/fireball'), dur=1),
+
+    #UI
+    'UI/Inv' : Load_IMG('UI/Inventory.png'),
+    'UI/pistol' : Load_IMG('UI/pistol.png'),
+    'UI/launcher' : Load_IMG('UI/launcher.png'),
+    'UI/rifle' : Load_IMG('UI/rifle.png'),
 }

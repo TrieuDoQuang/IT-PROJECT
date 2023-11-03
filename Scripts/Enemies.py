@@ -1,6 +1,7 @@
 from Scripts.Entities import *
 from Scripts.Weapons import Wep_Ene
-from Scripts.Particles import Earth_Cols
+from Scripts.Particles import Earth_Cols, Laser_line
+from Scripts.Projectile import FireBall
 import pygame, random
 
 class Skeleton(PhysicsEntity):
@@ -46,7 +47,7 @@ class Skeleton(PhysicsEntity):
         if self.Coll['bottom']:
             self.Air_time = 0
 
-        self.dbg = tilemap.solid_check((self.pos[0], self.pos[1]), self.size, self.flip)
+        # self.dbg = tilemap.solid_check((self.pos[0], self.pos[1]), self.size, self.flip)
 
         self.walking = max(0, self.walking - 1)
         if self.walking == 0:
@@ -56,11 +57,12 @@ class Skeleton(PhysicsEntity):
                 self.walk(tilemap)
 
         if abs(player.rect().x - self.rect().x) < 150:
-            if self.rect().x - player.rect().x > 0:
-                 self.flip = True
-            if self.rect().x - player.rect().x < 0:
-                self.flip = False
-            self.attack()
+            if self.rect().bottom - player.rect().bottom  < 64 and self.rect().bottom - player.rect().bottom >= 0:
+                if self.rect().x - player.rect().x > 0:
+                    self.flip = True
+                if self.rect().x - player.rect().x < 0:
+                    self.flip = False
+                self.attack()
 
         self.Earth()
         if self.action == 'idle' and self.Air_time < 1:
@@ -81,23 +83,24 @@ class Skeleton(PhysicsEntity):
 
     def render(self, surf, offset = (0,0)):
         #HITBOX DEBUG
-        ac = pygame.Surface(self.size)
-        pos = (self.rect().x - offset[0] , self.rect().y - offset[1])
-        surf.blit(ac, pos)
-        if self.dbg:
-            rect = pygame.Rect(self.dbg['pos'][0] * 32 -offset[0], self.dbg['pos'][1] *32 - offset[1], 32, 32)
-            ac2 = pygame.Surface((32, 32))
-            surf.blit(ac2, rect)
+        # ac = pygame.Surface(self.size)
+        # pos = (self.rect().x - offset[0] , self.rect().y - offset[1])
+        # surf.blit(ac, pos)
+        # if self.dbg:
+        #     rect = pygame.Rect(self.dbg['pos'][0] * 32 -offset[0], self.dbg['pos'][1] *32 - offset[1], 32, 32)
+        #     ac2 = pygame.Surface((32, 32))
+        #     surf.blit(ac2, rect)
 
         img = pygame.transform.scale(self.animation.IMG(), (self.animation.IMG().get_width() * self.scale , self.animation.IMG().get_height() * self.scale))
         surf.blit(pygame.transform.flip(img, self.flip, False), (self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
 
 class Thug(PhysicsEntity):
-    def __init__(self, e_type, pos, size, assets, Health = 100, speed=1.5, scale = 1, animations_offset=(0, 0)):
+    def __init__(self, game, e_type, pos, size, assets, Health = 100, speed=1.5, scale = 1, animations_offset=(0, 0)):
         super().__init__(e_type, pos, size, assets, Health, speed)
         self.scale = scale
         self.animations_offset = animations_offset
         self.walking = 0
+        self.game = game
         self.Air_time = 0
         self.attacking = False
 
@@ -114,6 +117,7 @@ class Thug(PhysicsEntity):
     def attack(self):
         self.walking = 0
         self.set_action('attack')
+        self.game.Particles.append(Laser_line(self.game, 10, self.rect(), -1 if self.flip else 1, 10, offset=(0, -11)))
         self.attacking = True
 
     def update(self, tilemap, player):
@@ -122,7 +126,7 @@ class Thug(PhysicsEntity):
         if self.Coll['bottom']:
             self.Air_time = 0
 
-        self.dbg = tilemap.solid_check((self.pos[0], self.pos[1]), self.size, self.flip)
+        # self.dbg = tilemap.solid_check((self.pos[0], self.pos[1]), self.size, self.flip)
 
         self.walking = max(0, self.walking - 1)
         if self.walking == 0:
@@ -132,12 +136,13 @@ class Thug(PhysicsEntity):
                 self.walk(tilemap)
 
         if self.action != 'attack':
-            if abs(player.rect().x - self.rect().x) < 200:
-                if self.rect().x - player.rect().x > 0:
-                    self.flip = True
-                if self.rect().x - player.rect().x < 0:
-                    self.flip = False
-                self.attack()
+            if abs(player.rect().x - self.rect().x) < 360:
+                 if self.rect().bottom - player.rect().bottom  < 64 and self.rect().bottom - player.rect().bottom >= 0:
+                    if self.rect().x - player.rect().x > 0:
+                        self.flip = True
+                    if self.rect().x - player.rect().x < 0:
+                        self.flip = False
+                    self.attack()
 
         if self.action == 'idle' and self.Air_time < 1:
             chance = random.randint(0, 100)
@@ -159,24 +164,27 @@ class Thug(PhysicsEntity):
 
     def render(self, surf, offset=(0, 0)):
         #HITBOX DEBUG
-        ac = pygame.Surface(self.size)
-        pos = (self.rect().x - offset[0] , self.rect().y - offset[1])
-        surf.blit(ac, pos)
-        if self.dbg:
-            rect = pygame.Rect(self.dbg['pos'][0] * 32 -offset[0], self.dbg['pos'][1] *32 - offset[1], 32, 32)
-            ac2 = pygame.Surface((32, 32))
-            surf.blit(ac2, rect)
+        # ac = pygame.Surface(self.size)
+        # pos = (self.rect().x - offset[0] , self.rect().y - offset[1])
+        # surf.blit(ac, pos)
+        # if self.dbg:
+        #     rect = pygame.Rect(self.dbg['pos'][0] * 32 -offset[0], self.dbg['pos'][1] *32 - offset[1], 32, 32)
+        #     ac2 = pygame.Surface((32, 32))
+        #     surf.blit(ac2, rect)
 
         img = pygame.transform.scale(self.animation.IMG(), (self.animation.IMG().get_width() * self.scale, self.animation.IMG().get_height() * self.scale))
         surf.blit(pygame.transform.flip(img, self.flip, False),(self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
 
 class Wizard(PhysicsEntity):
-    def __init__(self, e_type, pos, size, assets, Health = 100, speed=1.5, scale = 1, animations_offset=(0, 0)):
+    def __init__(self, game, e_type, pos, size, assets, Health = 100, speed=1.5, scale = 1, animations_offset=(0, 0)):
         super().__init__(e_type, pos, size, assets, Health, speed)
         self.scale = scale
         self.animations_offset = animations_offset
         self.walking = 0
         self.Air_time = 0
+        self.game = game
+        self.delay = 1000
+        self.timer = pygame.time.get_ticks()
         self.attacking = False
 
     def walk(self, tilemap):
@@ -191,8 +199,18 @@ class Wizard(PhysicsEntity):
 
     def attack(self):
         self.walking = 0
-        self.set_action('attack')
         self.attacking = True
+        self.fireball()
+        self.set_action('attack')
+    
+    def fireball(self):
+        if self.attacking:
+            current = pygame.time.get_ticks()
+            if self.action != 'attack':
+                self.timer = pygame.time.get_ticks()
+            if current - self.timer >= self.delay:
+                self.game.Projectile.append(FireBall(self.game, self.rect().center, -1 if self.flip else 1, 8, (20,15), 0, scale= 1.5, showtime=80, offset=(-75, -75)))
+                self.timer = pygame.time.get_ticks()
 
     def update(self, tilemap, player):
         super().update(tilemap)
@@ -200,8 +218,8 @@ class Wizard(PhysicsEntity):
         if self.Coll['bottom']:
             self.Air_time = 0
 
-        self.dbg = tilemap.solid_check(
-            (self.pos[0], self.pos[1]), self.size, self.flip)
+        # self.dbg = tilemap.solid_check(
+        #     (self.pos[0], self.pos[1]), self.size, self.flip)
 
         self.walking = max(0, self.walking - 1)
         if self.walking == 0:
@@ -212,11 +230,13 @@ class Wizard(PhysicsEntity):
 
         if self.action != 'attack':
             if abs(player.rect().x - self.rect().x) < 200:
-                if self.rect().x - player.rect().x > 0:
-                    self.flip = True
-                if self.rect().x - player.rect().x < 0:
-                    self.flip = False
-                self.attack()
+                if self.rect().bottom - player.rect().bottom  < 64 and self.rect().bottom - player.rect().bottom >= 0:
+                    if self.rect().x - player.rect().x > 0:
+                        self.flip = True
+                    if self.rect().x - player.rect().x < 0:
+                        self.flip = False
+                    self.attack()
+        self.fireball()
 
         if  self.action == 'idle' and self.Air_time < 1:
             chance = random.randint(0, 100)
@@ -236,13 +256,13 @@ class Wizard(PhysicsEntity):
 
     def render(self, surf, offset=(0, 0)):
         #HITBOX DEBUG
-        ac = pygame.Surface(self.size)
-        pos = (self.rect().x - offset[0] , self.rect().y - offset[1])
-        surf.blit(ac, pos)
-        if self.dbg:
-            rect = pygame.Rect(self.dbg['pos'][0] * 32 -offset[0], self.dbg['pos'][1] *32 - offset[1], 32, 32)
-            ac2 = pygame.Surface((32, 32))
-            surf.blit(ac2, rect)
+        # ac = pygame.Surface(self.size)
+        # pos = (self.rect().x - offset[0] , self.rect().y - offset[1])
+        # surf.blit(ac, pos)
+        # if self.dbg:
+        #     rect = pygame.Rect(self.dbg['pos'][0] * 32 -offset[0], self.dbg['pos'][1] *32 - offset[1], 32, 32)
+        #     ac2 = pygame.Surface((32, 32))
+        #     surf.blit(ac2, rect)
 
         img = pygame.transform.scale(self.animation.IMG(), (self.animation.IMG().get_width() * self.scale, self.animation.IMG().get_height() * self.scale))
         surf.blit(pygame.transform.flip(img, self.flip, False),(self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
@@ -277,8 +297,8 @@ class Zombie(PhysicsEntity):
         if self.Coll['bottom']:
             self.Air_time = 0
 
-        self.dbg = tilemap.solid_check(
-            (self.pos[0], self.pos[1]), self.size, self.flip)
+        # self.dbg = tilemap.solid_check(
+        #     (self.pos[0], self.pos[1]), self.size, self.flip)
 
         self.walking = max(0, self.walking - 1)
         if self.walking == 0:
@@ -287,12 +307,13 @@ class Zombie(PhysicsEntity):
             if self.Air_time < 1:
                 self.walk(tilemap)
 
-        if abs(player.rect().x - self.rect().x) < 400:
-            if self.rect().x - player.rect().x > 0:
-                self.flip = True
-            if self.rect().x - player.rect().x < 0:
-                self.flip = False
-            self.attack()
+        if abs(player.rect().x - self.rect().x) <= 224:
+            if self.rect().bottom - player.rect().bottom  < 64 and self.rect().bottom - player.rect().bottom >= 0:
+                if self.rect().x - player.rect().x > 0:
+                    self.flip = True
+                if self.rect().x - player.rect().x < 0:
+                    self.flip = False
+                self.attack()
         self.weapon.update(self.rect(), self.flip)
 
         if self.action == 'idle' and self.Air_time < 1 and self.weapon.action == 'idle':

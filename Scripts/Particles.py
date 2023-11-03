@@ -340,6 +340,7 @@ class Earth_Cols:
         self.count = 0
         self.parts = []
         self.done = False
+        self.hit = False
     
     def update(self):
         if self.count <= self.amounts:
@@ -352,8 +353,12 @@ class Earth_Cols:
             i.update()
             if i.done:
                 self.parts.remove(i)
-            if i.rect().colliderect(self.game.Player.rect()):
-                self.game.Player.DMG(100)
+
+            if not self.hit:
+                if i.rect().colliderect(self.game.Player.rect()):
+                    self.game.Player.DMG(100)
+                    self.game.Particles.append(Blood_explode(self.game, self.game.Player.rect().center, 5, 0.05, 15))
+                    self.hit = True
     
         count2 =  len(self.parts)
         if count2 == 0:
@@ -364,3 +369,51 @@ class Earth_Cols:
     def render(self, surf, offset):
         for i in self.parts:
             i.render(surf, offset)
+
+class Laser_line:
+    def __init__(self, game, height, rect, vel, amounts, offset = (0,0)):
+        self.game = game
+        self.rect = rect
+        self.height = height
+        self.vel = vel
+        self.amounts = amounts
+        self.count = self.amounts
+        self.offset = offset
+        self.done = False
+        self.hit = False
+    
+    def update(self):
+            width = 32 * self.count
+            self.surf = pygame.Surface((width, self.height), pygame.SRCALPHA)
+            if self.vel < 0:
+                self.rect2 = self.surf.get_rect(midright = (self.rect.centerx + self.offset[0], self.rect.centery + self.offset[1]))
+            else:
+                self.rect2 = self.surf.get_rect(midleft = (self.rect.centerx + self.offset[0], self.rect.centery + self.offset[1]))
+
+            if not self.hit:
+                if self.rect2.colliderect(self.game.Player.rect()):
+                    self.game.Player.DMG(100)
+                    self.game.Particles.append(Blood_explode(self.game, self.game.Player.rect().center, 5, 0.05, 15))
+                    self.hit = True
+
+            if self.count <= 0:
+                self.done = True
+                return True
+            self.count -= 0.5
+            return False
+    
+    def render(self, surf, offset):
+        if self.count % 2 != 0:
+            width = 32 * (self.count - 0.8)
+            if width < 0:
+                width = 0
+            surf2 = pygame.Surface((width, self.height))
+            surf2.fill('purple')
+            if self.vel < 0:
+                rect1 = self.surf.get_rect()
+                rect2 = surf2.get_rect(left = rect1.left)
+            elif self.vel > 0:
+                rect1 = self.surf.get_rect()
+                rect2 = surf2.get_rect(right = rect1.right)
+            self.surf.blit(surf2, rect2)
+            surf.blit(self.surf, (self.rect2.x - offset[0], self.rect2.y - offset[1]))

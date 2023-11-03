@@ -1,18 +1,26 @@
-import pygame, random
+import pygame, random, copy
 from Scripts.Weapons import *
 class Drop:
     def __init__(self, game, pos, type, size, scale = 1):
         self.game = game
-        self.pos = pos
+        self.pos = copy.deepcopy(pos)
         self.type = type
         self.action = ''
         self.size = size
         self.scale = scale
+        self.speed = -5
         self.set_action(self.type)
     
     def update(self):
         self.animation.update()
-    
+        self.pos[1] += self.speed
+        self.speed = min(self.speed + 1, 3)
+        entity_rect = self.rect()
+        for rect in self.game.tilemap.physic_rects_around(self.pos, self.size):
+            if entity_rect.colliderect(rect):
+                entity_rect.bottom = rect.top
+                self.pos[1] = entity_rect.y
+
     def function(self):
         pass
 
@@ -34,13 +42,13 @@ def DropHandler(game, pos):
         if chance < 100:
             choice2 = random.choice(['health', 'ammo_pistol', 'rocket', 'ammo_rifle'])
             if choice2 == 'health':
-                game.Drops.append(Drop_Health(game, pos, (100, 100)))
+                game.Drops.append(Drop_Health(game, pos, (30, 30)))
             if choice2 == 'ammo_pistol':
-                game.Drops.append(Ammo_Pistol(game, pos, (100,100)))
+                game.Drops.append(Ammo_Pistol(game, pos, (30, 23)))
             if choice2 == 'rocket':
-                game.Drops.append(Rocket(game, pos, (100,100)))
+                game.Drops.append(Rocket(game, pos, (30, 20)))
             if choice2 == 'ammo_rifle':
-                game.Drops.append(Ammo_Rifle(game, pos, (100,100)))
+                game.Drops.append(Ammo_Rifle(game, pos, (30, 26)))
 class Drop_Health(Drop):
     def __init__(self, game, pos, size, scale=1, amount = 100):
         super().__init__(game, pos, 'health', size, scale)
@@ -60,8 +68,6 @@ class Ammo_Pistol(Drop):
             if self.game.hands[i].type == "pistol":
                 self.game.hands[i].addBullets(self.amount)
 
-
-
 class Rocket(Drop):
     def __init__(self, game, pos,  size, scale=1, amount = 10):
         super().__init__(game, pos, 'rocket', size, scale)
@@ -72,8 +78,6 @@ class Rocket(Drop):
         for i in range (len1): 
             if self.game.hands[i].type == "launcher":
                 self.game.hands[i].addBullets(self.amount)
-        
-
 
 class Ammo_Rifle(Drop):
     def __init__(self, game, pos,  size, scale=1, amount = 10):

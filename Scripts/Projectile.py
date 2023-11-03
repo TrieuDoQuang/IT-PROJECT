@@ -73,3 +73,24 @@ class Small_ammo(Projectile):
 class Small_Ene_ammo(Projectile):
     def __init__(self, game, pos, vel, speed, size, angle, owner='Ene', dame=10, showtime=250, scale=1):
         super().__init__(game, 'small', pos, vel, speed, size, angle, owner, dame, showtime, scale)
+
+class FireBall(Projectile):
+    def __init__(self, game, pos, vel, speed, size, angle, owner='Ene', dame=10, showtime=250, scale=1, explosion=True, offset = (0,0)):
+        super().__init__(game,'fireball', pos, vel, speed, size, angle, owner, dame, showtime, scale, explosion)
+        self.animation = self.game.assets['bullet/' + self.type].copy()
+        self.offset = offset
+    
+    def update(self):
+        super().update()
+        self.animation.update()
+    
+    def render(self, surf, offset=(0, 0)):
+        if self.current_time - self.timer >= self.showtime:
+            # black = pygame.Surface(self.size)
+            # rect = pygame.Rect((self.pos[0] - offset[0], self.pos[1] - offset[1]), self.size)
+            # surf.blit(black, rect)
+
+            img_1 = self.animation.IMG()
+            img = pygame.transform.scale(img_1, (img_1.get_width() * self.scale, img_1.get_height() * self.scale))
+            img.set_colorkey('black')
+            surf.blit(pygame.transform.flip(img, True if self.vel == -1 else False, False), (self.pos[0] + self.offset[0] - offset[0], self.pos[1] + self.offset[1] - offset[1]))
