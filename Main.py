@@ -169,6 +169,13 @@ class Game:
                                 i.kill[0] = True
                                 self.Projectile.remove(i)
                                 break
+                        for boss in self.Boss.copy():
+                            if boss.rect().colliderect(i.rect()):
+                                boss.set_action('hit')
+                                boss.hurt_frame = pygame.time.get_ticks()
+                                boss.Recover_frame = pygame.time.get_ticks()
+                                boss.DMG(i.dame)
+                                i.kill[0] = True
                     else:
                         if self.Player.rect().colliderect(i.rect()):
                             if i.explosion:
