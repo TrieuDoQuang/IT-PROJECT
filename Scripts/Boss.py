@@ -1,6 +1,6 @@
 import pygame
 import random
-import math
+import math, copy
 # from Scripts.Particles import Particles
 
 # hit_sound = pygame.mixer.Sound('data/sfx/hit.wav')
@@ -19,7 +19,7 @@ class Boss:
         self.type = type
         self.health = Health
         self.health_max = Health
-        self.size = size
+        self.size = list(size)
         self.anim_offset = anim_offset
         self.pos = list(pos)
         self.bound = [0,0,0,0]
@@ -53,6 +53,7 @@ class Boss:
 
         self.now = 0
         self.scale = scale
+        self.Player_invs = 1000
     
     def DMG(self, health):
         self.health -= health
@@ -131,7 +132,7 @@ class Boss:
     def render(self, surf, offset = (0,0)):
         rect = self.rect()
         surf_rect = pygame.Surface((rect.width, rect.height))
-        surf.blit(surf_rect, (self.pos[0] - offset[0], self.pos[1] - offset[1]) )
+        surf.blit(surf_rect, (rect.x - offset[0], rect[1] - offset[1]) )
 
         img1 = self.animation.IMG()
         img2 = pygame.transform.scale(img1, (img1.get_width() * self.scale, img1.get_height() * self.scale))
@@ -149,7 +150,21 @@ class Evil_wizard(Boss):
         self.Burn_delay = 100
         self.Burn_frame = 0
 
+        self.size_bck = self.size[0]
+    def rect(self):
+        if self.action == 'attack1':
+            if self.flip:
+                return pygame.Rect(self.pos[0] - self.size[0] + 80, self.pos[1], self.size[0], self.size[1])
+            else:
+                return pygame.Rect(self.pos, self.size)
+        else:
+            return pygame.Rect(self.pos, self.size)
+    
     def update(self):
+        if self.action == 'attack1':
+            self.size[0] = self.size_bck + 120
+        else:
+            self.size[0] = self.size_bck
         super().update()
         self.Move()
         if self.rect().colliderect(self.game.Player.rect()):
@@ -161,7 +176,7 @@ class Evil_wizard(Boss):
             elif self.action == 'hit' or self.action == 'death':
                 pass
             else:
-                if self.now -self.attack_frame >= self.game.Player.invs:
+                if self.now -self.attack_frame >= self.Player_invs:
                     # hit_sound.play()
                     self.attack_frame = pygame.time.get_ticks()
                     self.game.Player.DMG(self.dmg)
