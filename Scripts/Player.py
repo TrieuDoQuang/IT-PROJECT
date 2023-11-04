@@ -1,10 +1,12 @@
 import pygame, math
 from Scripts.Entities import PhysicsEntity
+from Scripts.Particles import Dirt_Splater
 
 class Player(PhysicsEntity):
-    def __init__(self, e_type, pos, size, assets, Health = 400, speed = 2, size_mul = 1, animoffset = (-3, -3)):
+    def __init__(self, game, e_type, pos, size, assets, Health = 400, speed = 2, size_mul = 1, animoffset = (-3, -3)):
         super().__init__(e_type, pos, size, assets, Health, speed= speed)
         self.size_mul = size_mul
+        self.game = game
         self.hand_idx = 0
         self.animations_offset = list(animoffset)
         self.Air_time = 0
@@ -22,6 +24,7 @@ class Player(PhysicsEntity):
         self.dash_delay = 2000
         self.att_timer = pygame.time.get_ticks()
         self.att_delay = 700
+        self.spark_delay = 0
     
     def Movement(self, offset):
         keys = pygame.key.get_pressed()
@@ -130,6 +133,10 @@ class Player(PhysicsEntity):
                 self.set_action('run')
             else:
                 self.set_action('idle')
+        else:
+            self.spark_delay = (self.spark_delay + 1) % 11
+            if self.spark_delay % 10 == 0:
+                self.game.Particles.append(Dirt_Splater(self.game, 6, self.rect(), -1 if self.flip else 1, 1, 0.3, 8, offset=(0, -16), color1=(255, 239, 2), color2=(255, 247, 180)))
     
     def render(self, surf, offset = (0,0)):
        #HITBOX DEBUG

@@ -20,8 +20,9 @@ class Game:
         self.block_size = 32
         self.scroll = [0, 0]
         self.Clouds = Clouds(self.assets['Clouds'], count=20, size_mul=2)
+        self.Particles = []
         self.hands = []
-        self.Player = Player('Player', (250, 100), (25, 64), self.assets, size_mul=1, animoffset=(-32, 0))
+        self.Player = Player(self, 'Player', (250, 100), (25, 64), self.assets, size_mul=1, animoffset=(-32, 0))
         self.Butt_Play = Button((screen_w/2 - 100, 250), (200, 50), 'red', 'Play', 'Play', text_color='white', text_size=35)
         self.Butt_Exit = Button((screen_w/2 - 100, 320), (200, 50), 'red', 'Quit', 'Quit', text_color='white', text_size=35)
         self.tilemap = Tilemap(self, tile_size=32)
@@ -39,8 +40,7 @@ class Game:
         # Explosion
         self.explosion = []
 
-        # Particles
-        self.Particles = []
+        # Leaf Particles
         self.Leaf_spawner = []
         for tree in self.tilemap.extract([('large_decor', 2)], True):
             self.Leaf_spawner.append(pygame.Rect(tree['pos'][0] + 4, tree['pos'][1] + 4, 23, 13))
@@ -64,7 +64,7 @@ class Game:
         self.enemies = []
 
         # self.enemies = [Thug(self, 'Thug', (500,0), (24,54), self.assets, scale= 2.5, animations_offset=(-35, -9))]
-        # self.enemies = [Wizard(self, 'Wizard', (500,0), (40,53), self.assets, scale= 2.5, animations_offset=(-65, -67))]
+        self.enemies = [Wizard(self, 'Wizard', (500,0), (40,53), self.assets, scale= 2.5, animations_offset=(-65, -67))]
         # self.enemies = [Skeleton(self, 'Skeleton',(500,0), (32,80), self.assets, scale= 3, animations_offset=(-78, -64))]
         # self.enemies = [Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28))]
 
@@ -145,6 +145,7 @@ class Game:
                         else:
                             self.explosion.append(Explosion(i.rect().center, (200, 200), i.dame, 'Ene'))
                         self.Particles.append(Smoke_explode(self, i.rect().center, 4, 0.5, 20))
+                    self.Particles.append(Dirt_Splater(self, 10, i.rect(), -1 if i.flip else 1, 10, 0.3, 8))
                     i.kill[0] = True
                     self.Projectile.remove(i)
                     continue
@@ -166,8 +167,11 @@ class Game:
                             if i.explosion:
                                 self.explosion.append(Explosion(i.pos, (200, 200), i.dame, 'Ene'))
                                 self.Particles.append(Smoke_explode(self, i.rect().center, 4, 0.5, 20))
-                            self.Player.DMG(i.dame)
-                            self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 6, 0.05, 3))
+                            if not self.Player.is_dash:
+                                self.Player.DMG(i.dame)
+                                self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 6, 0.05, 3))
+                            else:
+                                self.Particles.append(Shock_waves(i.rect().center, 30, 'white', 5, amounts= 1))
                             i.kill[0] = True
                             self.Projectile.remove(i)
                             continue
@@ -177,10 +181,23 @@ class Game:
             if click:
                 self.hands[self.hand_idx].attack(self)
 
+            # PARTICLES HANDLER BEHIND
+            for Particle in sorted(self.Particles.copy(), key= lambda x: x.amounts):
+                if Particle.type == 'blood':
+                    kill = Particle.update()
+                    Particle.render(display, offset=render_scroll)
+                    if kill:
+                        self.Particles.remove(Particle)
+
             #ENEMIES HANDLER
             for i in self.enemies.copy():
                 i.update(self.tilemap, self.Player)
                 i.render(display, offset=render_scroll)
+                if self.Player.rect().colliderect(i.rect()):
+                    if self.Player.is_dash:
+                        i.DMG(100)
+                        self.Particles.append(Shock_waves(i.rect().center, 30, 'white', 5, amounts= 1))
+                        self.Particles.append(Blood_spill(self, i.rect().center, (-1 if self.Player.Vel.x < 0 else 1, 0), 6, 0.05, 3))
                 if i.Dead:
                     self.enemies.remove(i)
                     self.Particles.append(Blood_explode(self, i.pos, 5, 0.05, 15))
@@ -190,22 +207,30 @@ class Game:
             # PLAYER AND HAND RENDER
             self.Player.render(display, offset=render_scroll)
             self.hands[self.hand_idx].render(display, player= self.Player, offset=render_scroll)
+
+            #EXPLOSION HANDLER
             for i in self.explosion.copy():
                 if i.owner == 'Player':
                     for ene in self.enemies.copy():
                         if ene.rect().colliderect(i.rect()):
                             ene.DMG(i.dame)
+                            self.Particles.append(Blood_explode(self, ene.pos, 5, 0.05, 15))
                 else:
                     if self.Player.rect().colliderect(i.rect()):
-                        self.Player.DMG(i.dame)
+                        if not self.Player.is_dash:
+                            self.Player.DMG(i.dame)
+                            self.Particles.append(Blood_explode(self, self.Player.pos, 5, 0.05, 15))
+                # i.render(display, render_scroll)
+                self.Particles.append(Shock_waves(i.pos, 30, 'white', 5, amounts= 2))
                 self.explosion.remove(i)
             
-            # PARTICLES HANDLER
+            # PARTICLES HANDLER FRONT
             for Particle in sorted(self.Particles.copy(), key= lambda x: x.amounts):
-                kill = Particle.update()
-                Particle.render(display, offset=render_scroll)
-                if kill:
-                    self.Particles.remove(Particle)
+                if Particle.type != 'blood':
+                    kill = Particle.update()
+                    Particle.render(display, offset=render_scroll)
+                    if kill:
+                        self.Particles.remove(Particle)
             
             self.render_UI()
             self.cursor_render()

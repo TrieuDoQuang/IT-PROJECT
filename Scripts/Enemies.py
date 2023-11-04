@@ -136,7 +136,7 @@ class Thug(PhysicsEntity):
                 self.walk(tilemap)
 
         if self.action != 'attack':
-            if abs(player.rect().x - self.rect().x) < 360:
+            if abs(player.rect().x - self.rect().x) < 324:
                  if self.rect().bottom - player.rect().bottom  < 64 and self.rect().bottom - player.rect().bottom >= 0:
                     if self.rect().x - player.rect().x > 0:
                         self.flip = True

@@ -32,6 +32,7 @@ class Leaf:
 
 class Leafs:
     def __init__(self, game, leaf_spawner):
+        self.type = 'leaf'
         self.leaf_spawner = leaf_spawner
         self.game = game
         self.amounts = 0
@@ -116,6 +117,7 @@ class Smoke_Part:
 
 class Smoke_explode:
     def __init__(self, game, pos, speed, decay_rate, amounts):
+        self.type = 'smoke'
         self.game = game
         self.pos = list(pos)
         self.speed = speed
@@ -148,6 +150,7 @@ class Smoke_explode:
 
 class Smoke_Trail:
     def __init__(self, game, pos, Vel, speed, decay_rate, kill, obj_size):
+        self.type = 'smoke'
         self.game = game
         self.pos = pos
         self.speed = speed
@@ -199,6 +202,17 @@ class Blode_Part:
         self.gravity = min(self.gravity + 0.2, 10)
         self.speed = max(self.speed - 0.2, 0)
         self.pos[0] += -self.vel[0] * self.speed
+        entity_rect = self.rect()
+        for rect in self.game.tilemap.physic_rects_around(self.pos, (3, 3)):
+            if entity_rect.colliderect(rect):
+                if self.vel[0] > 0:
+                    entity_rect.left = rect.right
+                elif self.vel[0] < 0:
+                    entity_rect.right = rect.left
+                self.pos[0] = entity_rect.x
+                self.speed = 0
+                break
+
         self.pos[1] += self.vel[1] * self.gravity
         entity_rect = self.rect()
         for rect in self.game.tilemap.physic_rects_around(self.pos, (3, 3)):
@@ -234,6 +248,7 @@ class Blode_Part:
 
 class Blood_spill:
     def __init__(self, game, pos, vel, speed, decay_rate, amounts):
+        self.type = 'blood'
         self.game = game
         self.pos = list(pos)
         self.vel = vel
@@ -247,7 +262,7 @@ class Blood_spill:
     def update(self):
         if self.count <= self.amounts:
             pos = copy.deepcopy(self.pos)
-            self.parts.append(Blode_Part(self.game, pos, random.randint(5, 8), (self.vel.x, self.vel.y + random.randint(-10, 10)), self.decay, random.randint(1, self.speed)))
+            self.parts.append(Blode_Part(self.game, pos, random.randint(5, 8), (self.vel[0], self.vel[1] + random.randint(-10, 10)), self.decay, random.randint(1, self.speed)))
             self.count += 1
         
         for i in self.parts.copy():
@@ -267,6 +282,7 @@ class Blood_spill:
 
 class Blood_explode:
     def __init__(self, game, pos, speed, decay_rate, amounts):
+        self.type = 'blood'
         self.game = game
         self.pos = list(pos)
         self.decay = decay_rate
@@ -332,6 +348,7 @@ class Earth_coll:
 
 class Earth_Cols:
     def __init__(self, game, size, rect, vel, amounts):
+        self.type = 'earth'
         self.game = game
         self.rect = rect
         self.size = size
@@ -356,8 +373,9 @@ class Earth_Cols:
 
             if not self.hit:
                 if i.rect().colliderect(self.game.Player.rect()):
-                    self.game.Player.DMG(100)
-                    self.game.Particles.append(Blood_explode(self.game, self.game.Player.rect().center, 5, 0.05, 15))
+                    if not self.game.Player.is_dash:
+                        self.game.Player.DMG(100)
+                        self.game.Particles.append(Blood_explode(self.game, self.game.Player.rect().center, 5, 0.05, 15))
                     self.hit = True
     
         count2 =  len(self.parts)
@@ -372,6 +390,7 @@ class Earth_Cols:
 
 class Laser_line:
     def __init__(self, game, height, rect, vel, amounts, offset = (0,0)):
+        self.type = 'laser'
         self.game = game
         self.rect = rect
         self.height = height
@@ -417,3 +436,154 @@ class Laser_line:
                 rect2 = surf2.get_rect(right = rect1.right)
             self.surf.blit(surf2, rect2)
             surf.blit(self.surf, (self.rect2.x - offset[0], self.rect2.y - offset[1]))
+
+class Dirt_part:
+    def __init__(self, game, pos, size, vel, decay_rate, speed, color1, color2):
+        self.game = game
+        self.pos = list(pos)
+        self.size = size
+        vec2 = pygame.Vector2(list(vel))
+        self.vel = vec2
+        if vec2.magnitude():
+            self.vel = vec2.normalize()
+        self.decay = decay_rate
+        self.speed = speed
+        self.gravity = 7
+        self.done = False
+        self.color1 = color1
+        self.color2 = color2
+
+    def update(self):
+        self.gravity = min(self.gravity + 0.2, 10)
+        self.speed = max(self.speed - 0.2, 0)
+        self.pos[0] += -self.vel[0] * self.speed
+        self.pos[1] += self.vel[1] * self.gravity
+        entity_rect = self.rect()
+        for rect in self.game.tilemap.physic_rects_around(self.pos, (3, 3)):
+            if entity_rect.colliderect(rect):
+                if self.vel[1] > 0:
+                    entity_rect.bottom = rect.top
+                self.pos[1] = entity_rect.y
+                self.gravity = 0
+                break
+
+        if self.vel.y <= 0:
+            self.vel.y += 0.5
+
+        self.size -= self.decay
+        if self.size < 0:
+            self.done = True
+        self.color_change(self.color2, 5)
+             
+    def color_change(self, target_color, speed):
+        if self.color1[0] != target_color[0]:
+            self.color1[0] += (target_color[0] - self.color1[0])/speed
+        if self.color1[1] != target_color[1]:
+            self.color1[1] += (target_color[1] - self.color1[1])/speed
+        if self.color1[2] != target_color[2]:
+            self.color1[2] += (target_color[2] - self.color1[2])/speed
+
+    def rect(self):
+        surf = pygame.Surface((self.size, self.size))
+        return surf.get_rect(center = self.pos)
+
+    def render(self, surf, offset):
+        pygame.draw.circle(surf, self.color1, (self.pos[0] - offset[0], self.pos[1] - offset[1]), self.size)
+
+class Dirt_Splater:
+    def __init__(self, game, size, rect, vel, amounts, decay, speed, color1 = [86,43,0], color2 = [86,43,0], offset=(0,0)):
+        self.type = 'dirt'
+        self.game = game
+        self.rect = rect
+        self.size = size
+        self.vel = vel
+        self.amounts = amounts
+        self.decay = decay
+        self.speed = speed
+        self.count = 0
+        self.parts = []
+        self.done = False
+        self.offset = offset
+        self.color1 = list(color1)
+        self.color2 = list(color2)
+    
+    def update(self):
+        if self.count <= self.amounts:
+            if self.vel < 0:
+                loco = (self.rect.midleft[0] + self.offset[0], self.rect.midleft[1] + self.offset[1])
+            elif self.vel > 0:
+                loco = (self.rect.midright[0] + self.offset[0], self.rect.midright[1] + self.offset[1])
+            vel = [self.vel, random.randint(-10, 10)/10]
+            self.parts.append(Dirt_part(self.game, loco, random.randint(2, self.size), vel, self.decay, random.randint(5, self.speed), self.color1, self.color2))
+            self.count += 1
+
+        for i in self.parts.copy():
+            i.update()
+            if i.done:
+                self.parts.remove(i)
+    
+        count2 =  len(self.parts)
+        if count2 == 0:
+            self.done = True
+            return True
+        return False
+    
+    def render(self, surf, offset):
+        for i in self.parts:
+            i.render(surf, offset)
+
+class Shock_wave:
+    def __init__(self, pos, size, color, decay_rate):
+        self.pos = pos
+        self.color = color
+        self.decay_rate = decay_rate
+        self.size = size
+        self.alpha = 255
+        self.done = False
+    
+    def update(self):
+        self.alpha -= self.decay_rate
+        self.size += 5
+        if self.alpha < 0:
+            self.done = True
+    
+    def render(self, surf, offset):
+        img2 = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
+        rect = img2.get_rect()
+        pygame.draw.circle(img2, self.color, rect.center, self.size/2, 5)
+        img2.set_alpha(self.alpha)
+        rect = img2.get_rect(center = self.pos)
+        surf.blit(img2, (rect.x - offset[0], rect.y - offset[1]))
+
+class Shock_waves:
+    def __init__(self, pos, size, color, decay_rate, amounts):
+        self.amounts = 50
+        self.amounts2 = amounts
+        self.type = 'Shockwave'
+        self.pos = pos
+        self.color = color
+        self.decay_rate = decay_rate
+        self.size = size
+        self.done = False
+        self.count = 0
+        self.parts = []
+    
+    def update(self):
+        if self.count <= self.amounts2:
+            self.parts.append(Shock_wave(self.pos, random.randint(1, self.size), self.color, self.decay_rate))
+            self.count += 1
+        
+        for part in self.parts.copy():
+            part.update()
+            if part.done:
+                self.parts.remove(part)
+        
+        count2 =  len(self.parts)
+        if count2 == 0:
+            self.done = True
+            return True
+        return False
+    
+    def render(self, surf, offset):
+        for i in self.parts:
+            i.render(surf, offset)
