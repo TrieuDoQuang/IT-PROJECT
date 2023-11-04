@@ -45,7 +45,7 @@ class Boss:
         self.cool_down = 2000
         self.cool_frame = 0
 
-        self.Recover_cooldown = 500
+        self.Recover_cooldown = 150
         self.Recover_frame = 0
 
         self.Death_delay = 2500
