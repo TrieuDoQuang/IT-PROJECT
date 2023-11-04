@@ -74,4 +74,11 @@ Assets = {
     'UI/pistol' : Load_IMG('UI/pistol.png'),
     'UI/launcher' : Load_IMG('UI/launcher.png'),
     'UI/rifle' : Load_IMG('UI/rifle.png'),
+
+    #EVIL WIZARD
+    'Evil/idle' : Animation(Load_IMGS('entities/boss1/idle'), dur=8),
+    'Evil/move' : Animation(Load_IMGS('entities/boss1/move'), dur=8),
+    'Evil/hit' : Animation(Load_IMGS('entities/boss1/hit'), dur=8, loop=False),
+    'Evil/death' : Animation(Load_IMGS('entities/boss1/death'), dur=8, loop=False),
+    'Evil/attack1' : Animation(Load_IMGS('entities/boss1/attack'), dur=10),
 }

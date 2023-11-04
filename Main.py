@@ -12,6 +12,7 @@ from Scripts.Enemies import *
 from Scripts.Weapons import *
 from Scripts.Explosion import *
 from Scripts.Drops import DropHandler
+from Scripts.Boss import *
 
 class Game:
     def __init__(self):
@@ -61,10 +62,10 @@ class Game:
         self.hands.append(Pistol((15, 15), self.Player.pos, (10, 15), self.Projectile, scale= 1.2, offsetR=(30, 25), offsetL=(5, 30)))
         self.hand_idx = 0
         
+        #ENEMIES
         self.enemies = []
-
         # self.enemies = [Thug(self, 'Thug', (500,0), (24,54), self.assets, scale= 2.5, animations_offset=(-35, -9))]
-        self.enemies = [Wizard(self, 'Wizard', (500,0), (40,53), self.assets, scale= 2.5, animations_offset=(-65, -67))]
+        # self.enemies = [Wizard(self, 'Wizard', (500,0), (40,53), self.assets, scale= 2.5, animations_offset=(-65, -67))]
         # self.enemies = [Skeleton(self, 'Skeleton',(500,0), (32,80), self.assets, scale= 3, animations_offset=(-78, -64))]
         # self.enemies = [Zombie(self, 'Zombie', (500,0), (40,69), self.assets, scale= 3, animations_offset=(-28, -28))]
 
@@ -79,6 +80,12 @@ class Game:
         
         for enemy in self.tilemap.extract([('Spawner', 3)], keep=False):
             self.enemies.append(Wizard(self, 'Wizard', (enemy['pos'][0],enemy['pos'][1]), (40,53), self.assets, scale= 2.5, animations_offset=(-65, -67)))
+        
+        #BOSS
+        self.Boss = []
+        self.Boss.append(Evil_wizard(self, (100, 100), 'Evil', "Evil_wizard", (80, 150), anim_offset=(-190, -150)))
+        if len(self.Boss):
+            self.target = self.Boss[0]
 
     def run(self):
         if self.state == "Main_Menu":
@@ -203,12 +210,19 @@ class Game:
                     self.Particles.append(Blood_explode(self, i.pos, 5, 0.05, 15))
                     # print("before",self.hands[self.hand_idx].ammo, self.hands[self.hand_idx].type)
                     DropHandler(self, i.pos)
+            
+            # BOSS HANDLER
+            for boss in self.Boss.copy():
+                boss.update()
+                boss.render(display, offset= render_scroll)
+                if boss.Dead:
+                    self.Boss.remove(boss)
 
             # PLAYER AND HAND RENDER
             self.Player.render(display, offset=render_scroll)
             self.hands[self.hand_idx].render(display, player= self.Player, offset=render_scroll)
 
-            #EXPLOSION HANDLER
+            # EXPLOSION HANDLER
             for i in self.explosion.copy():
                 if i.owner == 'Player':
                     for ene in self.enemies.copy():
@@ -301,6 +315,12 @@ class Game:
         display.blit(ammo_surf, ammo_rect)
         display.blit(ammo_str, ammo_str_rect)
 
+    def Boss_health_name(self, screen, boss):
+        surf = BIG_FONT.render(boss.name, True, "white")
+        screen.blit(surf, (280, 410))
+        Health_bar = 600 * boss.health / boss.health_max
+        Health_bar_rect = pygame.Rect(20, 440, Health_bar, 25)
+        pygame.draw.rect(screen, 'aquamarine3', Health_bar_rect)
 
 
 if __name__ == '__main__':
