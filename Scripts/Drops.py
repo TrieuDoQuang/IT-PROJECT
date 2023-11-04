@@ -49,6 +49,18 @@ def DropHandler(game, pos):
                 game.Drops.append(Rocket(game, pos, (30, 20)))
             if choice2 == 'ammo_rifle':
                 game.Drops.append(Ammo_Rifle(game, pos, (30, 26)))
+
+def BossDropHandler(game, pos):
+    chance = random.randint(0, 100)
+    if chance < 5:
+        choice2 = random.choice(['health', 'ammo_pistol', 'rocket'])
+        if choice2 == 'rocket':
+            game.Drops.append(Rocket(game, pos, (30, 20)))
+        if choice2 == 'health':
+            game.Drops.append(Drop_Health(game, pos, (30, 30)))
+
+    elif chance < 10:
+        game.Drops.append(Ammo_Pistol(game, pos, (30, 23)))
 class Drop_Health(Drop):
     def __init__(self, game, pos, size, scale=1, amount = 100):
         super().__init__(game, pos, 'health', size, scale)

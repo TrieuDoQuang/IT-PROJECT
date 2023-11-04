@@ -1,5 +1,5 @@
 import pygame
-import sys
+import sys, os
 import random
 import math
 from Scripts.Buttons import Button
@@ -83,9 +83,14 @@ class Game:
         
         #BOSS
         self.Boss = []
-        self.Boss.append(Evil_wizard(self, (100, 100), 'Evil', "Evil_wizard", (80, 150), anim_offset=(-190, -150)))
+        for boss in self.tilemap.extract([('Boss', 0)], keep= False):
+            self.Boss.append(Evil_wizard(self, (boss['pos'][0], boss['pos'][1]), 'Evil', "Evil_wizard", (80, 150), anim_offset=(-190, -150)))
+        # self.Boss.append(Evil_wizard(self, (100, 100), 'Evil', "Evil_wizard", (80, 150), anim_offset=(-190, -150)))
         if len(self.Boss):
             self.target = self.Boss[0]
+
+        #LEVEL HANDLER
+        self.End = False
 
     def run(self):
         if self.state == "Main_Menu":
@@ -100,12 +105,6 @@ class Game:
 
         elif self.state == "Play":
             pygame.display.set_caption(str(pygame.time.Clock.get_fps(clock)))
-            # WIN_CONDITION
-            # if not len(self.enemies) and not len(self.Boss):
-            #     global level
-            #     global max_level
-            #     level = min(level + 1, max_level)
-            #     self.End = True
 
             # BACK_GROUND
             display.blit(pygame.transform.scale(self.assets['BG'], (screen_w, screen_h)), (0, 0))
@@ -176,6 +175,7 @@ class Game:
                                 boss.Recover_frame = pygame.time.get_ticks()
                                 boss.DMG(i.dame)
                                 i.kill[0] = True
+                                BossDropHandler(self, list(i.rect().center))
                     else:
                         if self.Player.rect().colliderect(i.rect()):
                             if i.explosion:
@@ -255,6 +255,8 @@ class Game:
             
             self.render_UI()
             self.cursor_render()
+            if len(self.Boss):
+                self.Boss_health_name(display, self.target)
 
             # TRANSITION
             if not self.temp:
@@ -264,10 +266,19 @@ class Game:
 
             if self.transition:
                 trans_surf = pygame.Surface(display.get_size())
-                pygame.draw.circle(trans_surf, "white", (display.get_width(
-                ) / 2, display.get_height() / 2), (30 - abs(self.transition)) * 25)
+                pygame.draw.circle(trans_surf, "white", (display.get_width() / 2, display.get_height() / 2), (30 - abs(self.transition)) * 25)
                 trans_surf.set_colorkey("white")
                 display.blit(trans_surf, (0, 0))
+            
+            # WIN_CONDITION
+            if len(self.enemies) == 0 and len(self.Boss) == 0:
+                if not self.End:
+                    global level
+                    level = min(level + 1, max_level)
+                    self.End = True
+
+            if self.Player.Dead:
+                self.End = True
 
         elif self.state == "Quit":
             pygame.quit()
@@ -323,11 +334,16 @@ class Game:
         display.blit(ammo_str, ammo_str_rect)
 
     def Boss_health_name(self, screen, boss):
-        surf = BIG_FONT.render(boss.name, True, "white")
-        screen.blit(surf, (280, 410))
-        Health_bar = 600 * boss.health / boss.health_max
-        Health_bar_rect = pygame.Rect(20, 440, Health_bar, 25)
-        pygame.draw.rect(screen, 'aquamarine3', Health_bar_rect)
+        Health_bar_width = 600 * boss.health / boss.health_max
+        if Health_bar_width < 0:
+            Health_bar_width = 0
+        Health_bar_surf = pygame.Surface((Health_bar_width, 25))
+        Health_bar_surf.fill('green')
+        Health_bar_rect = Health_bar_surf.get_rect(midbottom = (screen_w/2 , screen_h - 10))
+        text = BIG_FONT.render(boss.name, True, "red")
+        text_rect = text.get_rect(midbottom = Health_bar_rect.midtop)
+        screen.blit(text, text_rect)
+        screen.blit(Health_bar_surf, Health_bar_rect)
 
 
 if __name__ == '__main__':
@@ -337,6 +353,7 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode((screen_w, screen_h))
     display = pygame.surface.Surface((screen_w, screen_h))
     clock = pygame.time.Clock()
+    max_level = len(os.listdir('Data/Maps')) - 1
     level = 0
     click = False
 
@@ -360,6 +377,10 @@ if __name__ == '__main__':
             if event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     click = False
+
+        if game.End:
+            game = Game()
+            game.state = 'Play'
 
         game.run()
         screen.blit(pygame.transform.scale(

@@ -1,6 +1,7 @@
 import pygame
 import random
 import math, copy
+from Scripts.Drops import BossDropHandler
 # from Scripts.Particles import Particles
 
 # hit_sound = pygame.mixer.Sound('data/sfx/hit.wav')
@@ -13,7 +14,7 @@ import math, copy
 # Fire_sound.set_volume(0.3)
 
 class Boss:
-    def __init__(self, game, pos, type, name, size, Health = 10000, dmg = 100, scale = 1, anim_offset=(0,0)):
+    def __init__(self, game, pos, type, name, size, Health = 10000, dmg = 50, scale = 1, anim_offset=(0,0)):
         self.name = name
         self.game = game
         self.type = type
@@ -45,7 +46,7 @@ class Boss:
         self.cool_down = 2000
         self.cool_frame = 0
 
-        self.Recover_cooldown = 150
+        self.Recover_cooldown = 400
         self.Recover_frame = 0
 
         self.Death_delay = 2500
@@ -72,7 +73,7 @@ class Boss:
 
                         # if random.randint(0, 100) <= 5:
                         #     self.game.Health.append(Health(self.game.assets, self.game.Player.rect().center, random.choice([100, 150, 50])))
-                        
+                        BossDropHandler(self.game, list(self.rect().center))
                         self.game.target = self
 
                         self.set_action('hit')
@@ -171,7 +172,8 @@ class Evil_wizard(Boss):
             if self.action == 'attack1':
                 if self.now - self.Burn_frame >= self.Burn_delay:
                     # hit_sound.play()
-                    self.game.Player.DMG(10)
+                    if not self.game.Player.is_dash:
+                        self.game.Player.DMG(3)
                     self.Burn_frame = pygame.time.get_ticks()
             elif self.action == 'hit' or self.action == 'death':
                 pass
@@ -179,7 +181,8 @@ class Evil_wizard(Boss):
                 if self.now -self.attack_frame >= self.Player_invs:
                     # hit_sound.play()
                     self.attack_frame = pygame.time.get_ticks()
-                    self.game.Player.DMG(self.dmg)
+                    if not self.game.Player.is_dash:
+                        self.game.Player.DMG(self.dmg)
         
         if self.action != 'hit' and self.action != 'death':
             if self.action == 'attack1':

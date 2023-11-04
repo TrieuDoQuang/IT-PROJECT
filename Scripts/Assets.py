@@ -78,7 +78,7 @@ Assets = {
     #EVIL WIZARD
     'Evil/idle' : Animation(Load_IMGS('entities/boss1/idle'), dur=8),
     'Evil/move' : Animation(Load_IMGS('entities/boss1/move'), dur=8),
-    'Evil/hit' : Animation(Load_IMGS('entities/boss1/hit'), dur=3),
+    'Evil/hit' : Animation(Load_IMGS('entities/boss1/hit'), dur=6),
     'Evil/death' : Animation(Load_IMGS('entities/boss1/death'), dur=8, loop=False),
     'Evil/attack1' : Animation(Load_IMGS('entities/boss1/attack'), dur=10),
 }

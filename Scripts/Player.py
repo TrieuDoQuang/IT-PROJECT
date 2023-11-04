@@ -149,3 +149,5 @@ class Player(PhysicsEntity):
     
     def Heal(self, amount):
         self.Health += amount
+        if self.Health > self.Max_Health:
+            self.Health = self.Max_Health

@@ -31,7 +31,7 @@ class PhysicsEntity():
             self.Dead = True
     
     def FALL_DEAD(self):
-        if self.pos[1] > 600:
+        if self.pos[1] > 736 + 320:
             self.Dead = True
     
     def set_action(self, action):
