@@ -2,6 +2,7 @@ import pygame
 import random
 import math, copy
 from Scripts.Drops import BossDropHandler
+from Scripts.Projectile import Soul_bullet
 # from Scripts.Particles import Particles
 
 # hit_sound = pygame.mixer.Sound('data/sfx/hit.wav')
@@ -35,6 +36,7 @@ class Boss:
 
         self.Dir = pygame.math.Vector2()
         self.Dead = False
+        self.Dead_2 = False
         self.attack_frame = 0
         self.dmg = dmg
 
@@ -89,6 +91,7 @@ class Boss:
         self.pos[1] += self.Dir.y
 
         if self.health <= 0:
+            self.Dead_2 = True
             if self.Death_frame == 0:
                 self.Death_frame = pygame.time.get_ticks()
             self.set_action('death')
@@ -131,9 +134,9 @@ class Boss:
         self.animation.update()
     
     def render(self, surf, offset = (0,0)):
-        rect = self.rect()
-        surf_rect = pygame.Surface((rect.width, rect.height))
-        surf.blit(surf_rect, (rect.x - offset[0], rect[1] - offset[1]) )
+        # rect = self.rect()
+        # surf_rect = pygame.Surface((rect.width, rect.height))
+        # surf.blit(surf_rect, (rect.x - offset[0], rect[1] - offset[1]) )
 
         img1 = self.animation.IMG()
         img2 = pygame.transform.scale(img1, (img1.get_width() * self.scale, img1.get_height() * self.scale))
@@ -143,8 +146,8 @@ class Boss:
         return pygame.Rect(self.pos, self.size)
 
 class Evil_wizard(Boss):
-    def __init__(self, game, pos, type, name, size, Health = 10000, scale = 3, anim_offset = (0, 0)):
-        super().__init__(game, pos, type, name, size, Health, scale=scale, anim_offset=anim_offset)
+    def __init__(self, game, pos, name, size, Health = 10000, scale = 3, anim_offset = (0, 0)):
+        super().__init__(game, pos, 'Evil', name, size, Health, scale=scale, anim_offset=anim_offset)
         self.attack_delay = 2000
         self.attack_frame = 0
 
@@ -226,6 +229,101 @@ class Evil_wizard(Boss):
                         self.Dest[1] = self.pos[1] + random.randrange(-100, -50, 10)
                     elif self.pos[1] - 100 <= self.bound[3]:
                         self.Dest[1] = self.pos[1] + random.randrange(50, 100, 10)
+                    else:
+                        step = random.randrange(-100, 100, 10)
+                        if step >= 0 and step < 50:
+                            step = 50
+                        elif step < 0 and step > -70:
+                            step = -70
+                        self.Dest[1] = self.pos[1] + step
+
+class Ghost(Boss):
+    def __init__(self, game, pos, name, size, Health = 10000, scale = 3, anim_offset = (0, 0)):
+        super().__init__(game, pos, 'Ghost', name, size, Health, scale=scale, anim_offset=anim_offset)
+        self.attack_delay = 2000
+        self.attack_frame = 0
+
+        self.Soul_ball_delay = 1000
+        self.Soul_ball_frame = 0
+        self.bound[0] = self.pos[0] + 500
+        self.bound[1] = self.pos[0] - 500
+        self.bound[2] = self.pos[1] + 350
+        self.bound[3] = self.pos[1] - 350
+
+        self.charging = False
+    
+    def update(self):
+        super().update()
+        self.Move()
+        if self.action == 'hit':
+            if self.charging:
+                self.charging = False
+                self.game.Projectile.append(Soul_bullet(self.game, (self.rect().centerx, self.rect().centery -10 ), -1 if self.flip else 1, 8, (40, 30), 0, scale=2, offset= (-60, -80) if not self.flip else (-80, -80), showtime=100))
+        
+        if self.rect().colliderect(self.game.Player.rect()):
+            if self.action == 'hit' or self.action == 'death':
+                pass
+            else:
+                if self.now -self.attack_frame >= self.Player_invs:
+                    # hit_sound.play()
+                    self.attack_frame = pygame.time.get_ticks()
+                    if not self.game.Player.is_dash:
+                        self.game.Player.DMG(self.dmg)
+        
+        if self.action != 'hit' and self.action != 'death':
+            if self.action == 'attack1':
+                if self.charging:
+                    if self.now - self.Soul_ball_frame >= self.Soul_ball_delay:
+                        self.game.Projectile.append(Soul_bullet(self.game, (self.rect().centerx, self.rect().centery -30 ), -1 if self.flip else 1, 8, (70, 60), 0, scale=4, offset=(-140, -160) if not self.flip else (-160, -160), showtime=100))
+                        self.Soul_ball_frame = pygame.time.get_ticks()
+                        self.charging = False
+                if self.Dir.x == 0 and self.Dir.y == 0:
+                    if self.now - self.attack_frame >= self.attack_delay:
+                        self.set_action('idle')
+        
+    def Move(self):
+        now = pygame.time.get_ticks()
+        if self.action == 'idle':
+            if now - self.cool_frame >= self.cool_down:
+                self.cool_frame = pygame.time.get_ticks()
+                chance = random.randint(0, 100)
+                if chance <= 50:
+                    self.attack_frame = pygame.time.get_ticks()
+                    self.set_action('attack1')
+                    self.charging = True
+                    # Dash_sound.play()
+                    # Fire_sound.play()
+                    self.Soul_ball_frame = pygame.time.get_ticks()
+                    if self.rect().centery != self.game.Player.rect().centery:
+                        self.Dest[1] = self.game.Player.rect().centery - 100
+                    
+                    flip = self.rect().centerx - self.game.Player.rect().centerx
+                    if flip > 0:
+                        self.flip = True
+                    elif flip < 0:
+                        self.flip = False
+
+                elif chance <= 85:
+                    self.set_action('move')
+                    # Dash_sound.play()
+                    #X AXIS
+                    if self.pos[0] + 200 >= self.bound[0]:
+                        self.Dest[0] = self.pos[0] + random.randrange(-400, -50, 10)
+                    elif self.pos[0] - 200 <= self.bound[1]:
+                        self.Dest[0] = self.pos[0] + random.randrange(50, 400, 10)
+                    else:
+                        step = random.randrange(-200, 200, 10)
+                        if step >= 0 and step < 50:
+                            step = 50
+                        elif step < 0 and step > -50:
+                            step = -50
+                        self.Dest[0] = self.pos[0] + step
+
+                    #Y AXIS
+                    if self.pos[1] + 100 >= self.bound[2]:
+                        self.Dest[1] = self.pos[1] + random.randrange(-200, -50, 10)
+                    elif self.pos[1] - 100 <= self.bound[3]:
+                        self.Dest[1] = self.pos[1] + random.randrange(50, 200, 10)
                     else:
                         step = random.randrange(-100, 100, 10)
                         if step >= 0 and step < 50:

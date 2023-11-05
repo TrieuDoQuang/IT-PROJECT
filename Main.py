@@ -83,9 +83,14 @@ class Game:
         
         #BOSS
         self.Boss = []
+
         for boss in self.tilemap.extract([('Boss', 0)], keep= False):
-            self.Boss.append(Evil_wizard(self, (boss['pos'][0], boss['pos'][1]), 'Evil', "Evil_wizard", (80, 150), anim_offset=(-190, -150)))
-        # self.Boss.append(Evil_wizard(self, (100, 100), 'Evil', "Evil_wizard", (80, 150), anim_offset=(-190, -150)))
+            self.Boss.append(Evil_wizard(self, (boss['pos'][0], boss['pos'][1]), "Evil_wizard", (80, 150), anim_offset=(-190, -150)))
+        
+        for boss in self.tilemap.extract([('Boss', 1)], keep= False):
+            self.Boss.append(Ghost(self, (boss['pos'][0], boss['pos'][1]), "Reaper", (90, 160), anim_offset=(-100, -60)))
+        
+        
         if len(self.Boss):
             self.target = self.Boss[0]
 
@@ -170,12 +175,15 @@ class Game:
                                 break
                         for boss in self.Boss.copy():
                             if boss.rect().colliderect(i.rect()):
-                                boss.set_action('hit')
-                                boss.hurt_frame = pygame.time.get_ticks()
-                                boss.Recover_frame = pygame.time.get_ticks()
-                                boss.DMG(i.dame)
-                                i.kill[0] = True
-                                BossDropHandler(self, list(i.rect().center))
+                                self.target = boss
+                                if not boss.Dead_2:
+                                    boss.set_action('hit')
+                                    boss.hurt_frame = pygame.time.get_ticks()
+                                    boss.Recover_frame = pygame.time.get_ticks()
+                                    boss.DMG(i.dame)
+                                    BossDropHandler(self, list(i.rect().center))
+                                    self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 6, 0.05, 3))
+                                    i.kill[0] = True
                     else:
                         if self.Player.rect().colliderect(i.rect()):
                             if i.explosion:
@@ -332,6 +340,19 @@ class Game:
         ammo_str_rect = ammo_str.get_rect(center = (ammo_rect.centerx, ammo_rect.centery + 3))
         display.blit(ammo_surf, ammo_rect)
         display.blit(ammo_str, ammo_str_rect)
+
+        #DASHING_AVA
+        Dash_surf = pygame.Surface((260, 32), pygame.SRCALPHA)
+        pygame.draw.rect(Dash_surf, (0, 0, 0, 160), (0, 0, 260, 32), border_radius= 5)
+        Dash_rect = Dash_surf.get_rect(topleft = ammo_rect.topright)
+        Dash_status = self.Player.dash_ava
+        if Dash_status:
+            dash_text = BIG_FONT.render("Dash", True, "green")
+        else:
+            dash_text = BIG_FONT.render("Dash", True, "grey")
+        dash_text_rect = dash_text.get_rect(center = (Dash_rect.centerx, Dash_rect.centery + 3))
+        display.blit(Dash_surf, Dash_rect)
+        display.blit(dash_text, dash_text_rect)
 
     def Boss_health_name(self, screen, boss):
         Health_bar_width = 600 * boss.health / boss.health_max

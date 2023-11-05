@@ -25,6 +25,8 @@ class Player(PhysicsEntity):
         self.att_timer = pygame.time.get_ticks()
         self.att_delay = 700
         self.spark_delay = 0
+
+        self.dash_ava = True
     
     def Movement(self, offset):
         keys = pygame.key.get_pressed()
@@ -91,6 +93,11 @@ class Player(PhysicsEntity):
         current_time = pygame.time.get_ticks()
         if current_time - self.att_timer >= self.att_delay:
             self.is_attack = False
+        
+        if current_time - self.dash_timer >= self.dash_delay:
+            self.dash_ava = True
+        else:
+            self.dash_ava = False
         
         self.Walljump = False
         self.Movement(offset)

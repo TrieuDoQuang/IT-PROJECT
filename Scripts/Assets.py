@@ -81,4 +81,12 @@ Assets = {
     'Evil/hit' : Animation(Load_IMGS('entities/boss1/hit'), dur=6),
     'Evil/death' : Animation(Load_IMGS('entities/boss1/death'), dur=8, loop=False),
     'Evil/attack1' : Animation(Load_IMGS('entities/boss1/attack'), dur=10),
+
+    #GHOST
+    'bullet/soul': Animation(Load_IMGS('weapons/bullets/soul_bullet'), dur=2),
+    'Ghost/idle' : Animation(Load_IMGS('entities/boss2/idle'), dur=8),
+    'Ghost/move' : Animation(Load_IMGS('entities/boss2/move'), dur=8),
+    'Ghost/hit' : Animation(Load_IMGS('entities/boss2/hit'), dur=6),
+    'Ghost/death' : Animation(Load_IMGS('entities/boss2/death'), dur=10, loop=False),
+    'Ghost/attack1' : Animation(Load_IMGS('entities/boss2/attack'), dur=10),
 }
