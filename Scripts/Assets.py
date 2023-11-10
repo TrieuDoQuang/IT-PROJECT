@@ -20,6 +20,8 @@ Assets = {
     'Particles/leaf': Animation(Load_IMGS('particles/leaf'), dur=15, loop=False),
     'Particles/particle': Animation(Load_IMGS('particles/particle'), dur=10, loop=False),
     'Particles/earthwall': Animation(Load_IMGS('particles/earthwall'), dur=2, loop=False),
+    'Particles/D_spell': Animation(Load_IMGS('entities/boss3/spell'), dur=4, loop=False),
+
     #DROPS
     'Drops/ammo_pistol': Animation(Load_IMGS('drops/ammo_pistol'), dur=5, loop=False),
     'Drops/health': Animation(Load_IMGS('drops/health'), dur=5, loop=False),
@@ -89,4 +91,21 @@ Assets = {
     'Ghost/hit' : Animation(Load_IMGS('entities/boss2/hit'), dur=6),
     'Ghost/death' : Animation(Load_IMGS('entities/boss2/death'), dur=10, loop=False),
     'Ghost/attack1' : Animation(Load_IMGS('entities/boss2/attack'), dur=10),
+
+    #GROUDON
+    'Groudon/idle': Animation(Load_IMGS('entities/boss4/idle'), dur=8),
+    'Groudon/move' : Animation(Load_IMGS('entities/boss4/move'), dur=8),
+    'Groudon/hit' : Animation(Load_IMGS('entities/boss4/hit'), dur=6),
+    'Groudon/death' : Animation(Load_IMGS('entities/boss4/death'), dur=10, loop=False),
+    'Groudon/attack1' : Animation(Load_IMGS('entities/boss4/attack'), dur=10, loop= False),
+    'Groudon/attack2' : Animation(Load_IMGS('entities/boss4/attack2'), dur=10, loop= False),
+    'Groudon/attack3' : Animation(Load_IMGS('entities/boss4/attack3'), dur=15, loop= False),
+
+    #DEATH
+    'Death/idle': Animation(Load_IMGS('entities/boss3/idle'), dur=8),
+    'Death/move' : Animation(Load_IMGS('entities/boss3/move'), dur=8),
+    'Death/hit' : Animation(Load_IMGS('entities/boss3/hit'), dur=6),
+    'Death/death' : Animation(Load_IMGS('entities/boss3/death'), dur=10, loop=False),
+    'Death/attack1' : Animation(Load_IMGS('entities/boss3/attack'), dur=8, loop= False),
+    'Death/attack2' : Animation(Load_IMGS('entities/boss3/attack2'), dur=10, loop= False),
 }

@@ -130,7 +130,7 @@ class Smoke_explode:
     def update(self):
         if self.count <= self.amounts:
             pos = copy.deepcopy(self.pos)
-            self.parts.append(Smoke_Part(self.game, pos, random.randint(30, 41), (random.randint(-10, 10)/10, random.randint(-10, 10)/10), self.decay, random.randint(1,self.speed)))
+            self.parts.append(Smoke_Part(self.game, pos, random.randint(50, 71), (random.randint(-10, 10)/10, random.randint(-10, 10)/10), self.decay, random.randint(1,self.speed)))
             self.count +=1
 
         for i in self.parts.copy():
@@ -387,6 +387,60 @@ class Earth_Cols:
     def render(self, surf, offset):
         for i in self.parts:
             i.render(surf, offset)
+
+class Dark_spell:
+    def __init__(self, game, size, obj_rect, amounts):
+        self.type = 'D_Spell'
+        self.game = game
+        self.obj_rect = obj_rect
+        self.size = list(size)
+        self.action = ''
+        self.set_action('D_spell')
+        self.scale = 2.5
+
+        self.amounts = amounts
+        self.done = False
+        self.hit_frame = 0
+        self.hit_delay = 800
+        self.speed = 7
+        
+    def set_action(self, action):
+        if action != self.action:
+            self.action = action
+            self.animation = self.game.assets['Particles/' + self.action].copy()
+    
+    def rect(self):
+        pos = list(self.obj_rect.midtop)
+        pos[1] -= 60
+        pos[0] -= self.obj_rect.width / 2 
+        return pygame.Rect(pos, self.size)
+
+    def update(self):
+        now = pygame.time.get_ticks()
+        self.animation.update()
+        self.size[1] += self.speed
+        self.speed = max(self.speed - 0.5, 0.5)
+
+        
+        if self.rect().colliderect(self.game.Player.rect()):
+            if now - self.hit_frame >= self.hit_delay:
+                if not self.game.Player.is_dash:
+                    self.game.Player.DMG(10)
+                    self.game.Particles.append(Blood_explode(self.game, self.game.Player.rect().center, 5, 0.05, 15))
+                self.hit_frame = pygame.time.get_ticks()
+    
+        if self.animation.done:
+            self.done = True
+            return True
+        return False
+    
+    def render(self, surf, offset):
+        # surf2 = pygame.Surface(self.size)
+        # surf.blit(surf2, (self.rect().x - offset[0], self.rect().y - offset[1]))
+
+        img = self.animation.IMG()
+        img2 = pygame.transform.scale(img, (img.get_width() * self.scale, img.get_height() * self.scale))
+        surf.blit(img2, (self.rect().x - offset[0] - 130, self.rect().y - offset[1] - 105))
 
 class Laser_line:
     def __init__(self, game, height, rect, vel, amounts, offset = (0,0)):

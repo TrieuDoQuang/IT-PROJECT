@@ -90,7 +90,11 @@ class Game:
         for boss in self.tilemap.extract([('Boss', 1)], keep= False):
             self.Boss.append(Ghost(self, (boss['pos'][0], boss['pos'][1]), "Reaper", (90, 160), anim_offset=(-100, -60)))
         
+        for boss in self.tilemap.extract([('Boss', 3)], keep= False):
+            self.Boss.append(Groudon(self, (boss['pos'][0], boss['pos'][1]), "Machine dragon", (125, 190), anim_offset=(-100, -60), scale=2))
         
+        for boss in self.tilemap.extract([('Boss', 2)], keep= False):
+            self.Boss.append(Death(self, (boss['pos'][0], boss['pos'][1]), "Bringer of Death", (90, 155), anim_offsetL=(-165, -30), anim_offseR=(-30, -30), scale=2))
         if len(self.Boss):
             self.target = self.Boss[0]
 
@@ -149,7 +153,7 @@ class Game:
                         self.Particles.append(Smoke_explode(self, i.rect().center, 4, 0.5, 20))
                     self.Projectile.remove(i)
                     continue
-                elif self.tilemap.Tiles_around(i.pos, i.size):
+                elif self.tilemap.physic_rects_around(i.pos, i.size):
                     if i.explosion:
                         if i.owner == 'player':
                             self.explosion.append(Explosion(i.pos, (200, 200), i.dame, 'Player'))
@@ -177,9 +181,12 @@ class Game:
                             if boss.rect().colliderect(i.rect()):
                                 self.target = boss
                                 if not boss.Dead_2:
-                                    boss.set_action('hit')
+                                    if boss.Hurt_anim:
+                                        boss.set_action('hit')
                                     boss.hurt_frame = pygame.time.get_ticks()
                                     boss.Recover_frame = pygame.time.get_ticks()
+                                    boss.Hurt = True
+                                    boss.flash_frame = pygame.time.get_ticks()
                                     boss.DMG(i.dame)
                                     BossDropHandler(self, list(i.rect().center))
                                     self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 6, 0.05, 3))
@@ -191,7 +198,7 @@ class Game:
                                 self.Particles.append(Smoke_explode(self, i.rect().center, 4, 0.5, 20))
                             if not self.Player.is_dash:
                                 self.Player.DMG(i.dame)
-                                self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 6, 0.05, 3))
+                                self.Particles.append(Blood_explode(self, self.Player.rect().center, 6, 0.05, 20))
                             else:
                                 self.Particles.append(Shock_waves(i.rect().center, 30, 'white', 5, amounts= 1))
                             i.kill[0] = True
@@ -248,9 +255,9 @@ class Game:
                     if self.Player.rect().colliderect(i.rect()):
                         if not self.Player.is_dash:
                             self.Player.DMG(i.dame)
-                            self.Particles.append(Blood_explode(self, self.Player.pos, 5, 0.05, 15))
+                            self.Particles.append(Blood_explode(self, self.Player.rect().center, 5, 0.05, 15))
                 # i.render(display, render_scroll)
-                self.Particles.append(Shock_waves(i.pos, 30, 'white', 5, amounts= 2))
+                self.Particles.append(Shock_waves(i.rect().center, 30, 'white', 5, amounts= 2))
                 self.explosion.remove(i)
             
             # PARTICLES HANDLER FRONT
