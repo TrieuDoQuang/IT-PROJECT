@@ -15,7 +15,12 @@ from Scripts.Drops import DropHandler
 from Scripts.Boss import *
 
 class Game:
-    def __init__(self):
+    def __init__(self):   
+        #BUTTONS
+        self.Butt_Play = Button((screen_w/2 - 100, 350), (200, 50), 'red', 'Play', 'Play', text_color='white', text_size=35)
+        self.Butt_Exit = Button((screen_w/2 - 100, 420), (200, 50), 'red', 'Quit', 'Quit', text_color='white', text_size=35)
+
+        #ASSETS
         self.assets = Assets
         self.state = "Main_Menu"
         self.block_size = 32
@@ -24,8 +29,6 @@ class Game:
         self.Particles = []
         self.hands = []
         self.Player = Player(self, 'Player', (250, 100), (25, 64), self.assets, size_mul=1, animoffset=(-32, 0))
-        self.Butt_Play = Button((screen_w/2 - 100, 250), (200, 50), 'red', 'Play', 'Play', text_color='white', text_size=35)
-        self.Butt_Exit = Button((screen_w/2 - 100, 320), (200, 50), 'red', 'Quit', 'Quit', text_color='white', text_size=35)
         self.tilemap = Tilemap(self, tile_size=32)
         self.transition = -30
         dest = 'Data/Maps/' + str(level) + '.json'
@@ -100,6 +103,8 @@ class Game:
 
         #LEVEL HANDLER
         self.End = False
+        self.name_move_flag = False
+        self.name_offset_move = 1
 
     def run(self):
         if self.state == "Main_Menu":
@@ -109,6 +114,28 @@ class Game:
             res = self.Butt_Exit.update()
             if res:
                 self.state = res
+
+            self.assets['Paralax_1'].update()
+            bg = self.assets['Paralax_1'].IMG()
+            display.blit(pygame.transform.scale(bg, (screen_w, screen_h)), (0, 0))
+
+            name = self.assets['Name']
+            name_rect = name.get_rect(center = (screen_w/2, 150 + self.name_offset_move))
+            if not self.name_move_flag:
+                if self.name_offset_move % 60 != 0:
+                    self.name_offset_move += 0.5
+                else:
+                    self.name_offset_move -= 0.5
+                    self.name_move_flag = True
+            else:
+                if self.name_offset_move % 60 != 0:
+                    self.name_offset_move -= 0.5
+                else:
+                    self.name_offset_move += 0.5
+                    self.name_move_flag = False
+
+            display.blit(name, name_rect)
+
             self.Butt_Play.render(display)
             self.Butt_Exit.render(display)
 

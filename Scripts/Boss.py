@@ -153,7 +153,7 @@ class Boss:
         return pygame.Rect(self.pos, self.size)
 
 class Evil_wizard(Boss):
-    def __init__(self, game, pos, name, size, Health = 10000, scale = 3, anim_offset = (0, 0)):
+    def __init__(self, game, pos, name, size, Health = 8000, scale = 3, anim_offset = (0, 0)):
         super().__init__(game, pos, 'Evil', name, size, Health, scale=scale, anim_offset=anim_offset)
         self.attack_delay = 2000
         self.attack_frame = 0
@@ -246,7 +246,7 @@ class Evil_wizard(Boss):
                         self.Dest[1] = self.pos[1] + step
 
 class Ghost(Boss):
-    def __init__(self, game, pos, name, size, Health = 10000, scale = 3, anim_offset = (0, 0)):
+    def __init__(self, game, pos, name, size, Health = 8000, scale = 3, anim_offset = (0, 0)):
         super().__init__(game, pos, 'Ghost', name, size, Health, scale=scale, anim_offset=anim_offset)
         self.attack_delay = 2000
         self.attack_frame = 0
@@ -342,7 +342,7 @@ class Ghost(Boss):
                         self.Dest[1] = self.pos[1] + step
 
 class Groudon(Boss):
-    def __init__(self, game, pos, name, size, Health=10000, dmg=50, scale=1, anim_offset=(0, 0)):
+    def __init__(self, game, pos, name, size, Health=15000, dmg=50, scale=1, anim_offset=(0, 0)):
         super().__init__(game, pos, 'Groudon', name, size, Health, dmg, scale, anim_offset)
         self.attack_delay = 1000
         self.attack_frame = 0
