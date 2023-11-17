@@ -6,13 +6,17 @@ screen_h = 736
 screen = pygame.display.set_mode((screen_w, screen_h))
 
 Assets = {
+    # BACKGROUND
     'BG': Load_IMG('bg/Background_Day.png'),
     'Paralax_1': Animation(Load_IMGS('bg/paralax_1'), dur=2),
     'Paralax_2': Animation(Load_IMGS('bg/paralax_2'), dur=2),
     'Paralax_3': Animation(Load_IMGS('bg/paralax_3'), dur=2),
 
+    # NAME
     'Name' : Load_IMG('bg/title.png'),
     
+    # TILES ASSETS
+    'help' : [Load_IMGS('help'), 1],
     'Clouds': Load_IMGS('clouds'),
     'stone': [Load_IMGS('tiles/stone'), 2],
     'dirt': [Load_IMGS('tiles/dirt'), 2],
@@ -22,6 +26,7 @@ Assets = {
     'grass2': [Load_IMGS('tiles/grass2'), 2],
     'decor': [Load_IMGS('tiles/decor'), 2],
     'large_decor': [Load_IMGS('tiles/large_decor'), 3],
+    
     # Particles
     'Particles/leaf': Animation(Load_IMGS('particles/leaf'), dur=15, loop=False),
     'Particles/particle': Animation(Load_IMGS('particles/particle'), dur=10, loop=False),
@@ -47,6 +52,7 @@ Assets = {
     'Player/die': Animation(Load_IMGS('entities/player/die'), dur=13, loop=False),
     'Player/attack0': Animation(Load_IMGS('entities/player/attack1'), dur=7, loop=False),
     'Player/attack1': Animation(Load_IMGS('entities/player/attack2'), dur=8, loop=False),
+    
     # Enemies ANIMS
     # Skeleton
     'Skeleton/idle': Animation(Load_IMGS('entities/enemies/skeleton/idle'), dur=10),
@@ -82,6 +88,13 @@ Assets = {
     'UI/pistol' : Load_IMG('UI/pistol.png'),
     'UI/launcher' : Load_IMG('UI/launcher.png'),
     'UI/rifle' : Load_IMG('UI/rifle.png'),
+
+    #HELP_UI
+    'Help/Left_mouse' : Load_IMG('help_UI/left_mouse.png'),
+    'Help/Scroll' : Load_IMG('help_UI/scroll.png'),
+    'Help/Shift' : Load_IMG('help_UI/shift.png'),
+    'Help/Move' : Load_IMG('help_UI/move.png'),
+
 
     #EVIL WIZARD
     'Evil/idle' : Animation(Load_IMGS('entities/boss1/idle'), dur=8),

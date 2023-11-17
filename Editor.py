@@ -9,6 +9,7 @@ from Scripts.Tilemap import Tilemap
 class Editor():
     def __init__(self):
         self.assets = {
+            'help' : [Load_IMGS('help'), 1],
             'decor' : [Load_IMGS('tiles/decor'), 2],
             'grass' : [Load_IMGS('tiles/grass'), 2],
             'stone' : [Load_IMGS('tiles/stone'), 2],
@@ -51,19 +52,23 @@ class Editor():
         loco_stroff = str(loco_off[0]) + ';' + str(loco_off[1])
 
         #Ghosting
-        size_mul = self.assets[self.Tile_list[self.Tile_group]][1]
-        img2 = current_tile_img.copy()
-        img2 = pygame.transform.scale(img2, (img2.get_width() * size_mul, img2.get_height() * size_mul))
-        if On_grid:
-            Display.blit(img2, (loco[0] * self.Tilemap.tile_size - self.scroll[0], loco[1] * self.Tilemap.tile_size - self.scroll[1]))
-        else:
-            Display.blit(img2, (loco_off[0] * self.Tilemap.tile_size - self.scroll[0], loco_off[1] * self.Tilemap.tile_size - self.scroll[1]) )
-
-        if clicking:
+        pos_check = loco[1] * self.Tilemap.tile_size
+        if pos_check < 992:
+            size_mul = self.assets[self.Tile_list[self.Tile_group]][1]
+            img2 = current_tile_img.copy()
+            img2 = pygame.transform.scale(img2, (img2.get_width() * size_mul, img2.get_height() * size_mul))
             if On_grid:
-                self.Tilemap.tilemap[loco_str] = {'type': self.Tile_list[self.Tile_group], 'variant': self.Tile_variant, 'pos' : (loco[0], loco[1]), 'size' : self.Tile_list[self.Tile_group][1]}
+                Display.blit(img2, (loco[0] * self.Tilemap.tile_size - self.scroll[0], loco[1] * self.Tilemap.tile_size - self.scroll[1]))
             else:
-                self.Tilemap.offgrid_map[loco_stroff] = {'type': self.Tile_list[self.Tile_group], 'variant': self.Tile_variant, 'pos' : (loco_off[0], loco_off[1]), 'size' : self.Tile_list[self.Tile_group][1]}
+                Display.blit(img2, (loco_off[0] * self.Tilemap.tile_size - self.scroll[0], loco_off[1] * self.Tilemap.tile_size - self.scroll[1]) )
+
+            if clicking:
+                if On_grid:
+                    self.Tilemap.tilemap[loco_str] = {'type': self.Tile_list[self.Tile_group], 'variant': self.Tile_variant, 'pos' : (loco[0], loco[1]), 'size' : self.Tile_list[self.Tile_group][1]}
+                else:
+                    self.Tilemap.offgrid_map[loco_stroff] = {'type': self.Tile_list[self.Tile_group], 'variant': self.Tile_variant, 'pos' : (loco_off[0], loco_off[1]), 'size' : self.Tile_list[self.Tile_group][1]}
+        else:
+            print("Out of Bound !!")
 
         if right_click:
             if loco_str in self.Tilemap.tilemap.copy():

@@ -20,6 +20,7 @@ class Game:
         self.Butt_Reset = Button((screen_w/2 - 100, 350), (200, 50), 'red', 'Reset', 'New Game', text_color='white', text_size=35)
         self.Butt_Play = Button((screen_w/2 - 100, 420), (200, 50), 'red', 'Play', 'Continue', text_color='white', text_size=35)
         self.Butt_Exit = Button((screen_w/2 - 100, 490), (200, 50), 'red', 'Quit', 'Quit', text_color='white', text_size=35)
+        self.Butt_Main_Menu = Button((screen_w/2 - 100, 280), (200, 50), 'red', 'Menu', 'Main Menu', text_color='white', text_size=35)
 
         #ASSETS
         self.assets = Assets
@@ -376,7 +377,6 @@ class Game:
         self.Player.Health = map_data['health']
         level = map_data['level']
 
-
     def cursor_render(self):
         pygame.mouse.set_visible(False)
         mouse_pos = pygame.mouse.get_pos()
@@ -501,16 +501,29 @@ if __name__ == '__main__':
                 game.run()
                 game.cursor_render()
             else:
-                display.blit(Pause_surf, (0, 0))
+                # PAUSE MENU
+                resp = game.Butt_Main_Menu.update()
+                if resp == 'Menu':
+                    game = Game()
+                    pygame.mouse.set_visible(True)
+                    Pause = False
+                else:
+                    display.blit(Pause_surf, (0, 0))
+                    black_overlay = pygame.Surface((screen_w, screen_h))
+                    black_overlay.fill('black')
+                    black_overlay.set_alpha(100)
+                    display.blit(black_overlay, (0, 0))
+                    game.Butt_Main_Menu.render(display)
 
-                black_overlay = pygame.Surface((screen_w, screen_h))
-                black_overlay.fill('black')
-                black_overlay.set_alpha(100)
-                display.blit(black_overlay, (0, 0))
+                    display.blit(Assets['Help/Left_mouse'], (850, 400))
+                    display.blit(Assets['Help/Scroll'], (850, 500))
+                    display.blit(Assets['Help/Shift'], (850, 600))
+                    display.blit(Assets['Help/Move'], (50, 540))
 
-                text = MEGA_FONT.render('PAUSE', True, 'white')
-                display.blit(text, (screen_w/2 - text.get_width()/2, screen_h/2))
-                game.cursor_render()
+                    text = MEGA_FONT.render('PAUSE', True, 'white')
+                    display.blit(text, (screen_w/2 - text.get_width()/2 + 5, screen_h/2 - 140))
+                    game.cursor_render()
+
         else:
             game.run()
 
