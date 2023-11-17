@@ -8,6 +8,9 @@ screen = pygame.display.set_mode((screen_w, screen_h))
 Assets = {
     'BG': Load_IMG('bg/Background_Day.png'),
     'Paralax_1': Animation(Load_IMGS('bg/paralax_1'), dur=2),
+    'Paralax_2': Animation(Load_IMGS('bg/paralax_2'), dur=2),
+    'Paralax_3': Animation(Load_IMGS('bg/paralax_3'), dur=2),
+
     'Name' : Load_IMG('bg/title.png'),
     
     'Clouds': Load_IMGS('clouds'),

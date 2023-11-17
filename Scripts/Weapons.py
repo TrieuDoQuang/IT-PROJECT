@@ -93,6 +93,7 @@ class Pistol(Weapon):
                     self.projectile.append(Small_ammo(game, (game.Player.rect().centerx ,game.Player.rect().centery - 15), self.flip, 8, (15, 10), self.angle, dame = self.dame, showtime= 100))
                     self.ammo -= 1
                     self.timer = pygame.time.get_ticks()
+
 class Rifle(Weapon):
     def __init__(self, size, pos, pivot, projectile,  dame = 20, scale=1, offsetL=(0, 0), offsetR=(0, 0), delay= 400, ammo=50):
         super().__init__('rifle', size, pos, pivot, projectile, dame, scale, offsetL, offsetR, delay, ammo)
@@ -130,7 +131,7 @@ class Launcher(Weapon):
                     self.projectile.append(Rocket_ammo(game, (game.Player.rect().centerx - 5,game.Player.rect().centery - 10), self.flip, 8, (20, 12), self.angle, dame = self.dame, showtime= 120, scale=0.4))
                     self.ammo -= 1
                     self.timer = pygame.time.get_ticks()
-
+                    
 class Wep_Ene:
     def __init__(self, type, Loffset = (0,0), Roffset=(0,0), scale = 1, delay = 1000, dame = 10):
         self.type = type

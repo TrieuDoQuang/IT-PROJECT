@@ -1,7 +1,7 @@
 import pygame
 import sys, os
 import random
-import math
+import math, json
 from Scripts.Buttons import Button
 from Scripts.Clouds import Clouds
 from Scripts.Player import Player
@@ -17,8 +17,9 @@ from Scripts.Boss import *
 class Game:
     def __init__(self):   
         #BUTTONS
-        self.Butt_Play = Button((screen_w/2 - 100, 350), (200, 50), 'red', 'Play', 'Play', text_color='white', text_size=35)
-        self.Butt_Exit = Button((screen_w/2 - 100, 420), (200, 50), 'red', 'Quit', 'Quit', text_color='white', text_size=35)
+        self.Butt_Reset = Button((screen_w/2 - 100, 350), (200, 50), 'red', 'Reset', 'New Game', text_color='white', text_size=35)
+        self.Butt_Play = Button((screen_w/2 - 100, 420), (200, 50), 'red', 'Play', 'Continue', text_color='white', text_size=35)
+        self.Butt_Exit = Button((screen_w/2 - 100, 490), (200, 50), 'red', 'Quit', 'Quit', text_color='white', text_size=35)
 
         #ASSETS
         self.assets = Assets
@@ -31,11 +32,6 @@ class Game:
         self.Player = Player(self, 'Player', (250, 100), (25, 64), self.assets, size_mul=1, animoffset=(-32, 0))
         self.tilemap = Tilemap(self, tile_size=32)
         self.transition = -30
-        dest = 'Data/Maps/' + str(level) + '.json'
-        try:
-            self.tilemap.Load(dest)
-        except FileNotFoundError:
-            pass
         self.temp = 1
 
         # Projectiles
@@ -43,7 +39,34 @@ class Game:
 
         # Explosion
         self.explosion = []
+        
+        #DROPS
+        self.Drops = []
+        
+        #WEAPONS
+        self.hands.append(Pistol((15, 15), self.Player.pos, (10, 15), self.Projectile, scale= 1.2, offsetR=(30, 25), offsetL=(5, 30)))
+        self.hands.append(Rifle((15, 15), self.Player.pos, (30, 15), self.Projectile, scale= 1.2, offsetR=(20, 25), offsetL=(2, 50)))
+        self.hands.append(Launcher((15, 15), self.Player.pos, (58, 20), self.Projectile, scale= 0.2, offsetR=(10, 15), offsetL=(8, 35)))
+        self.hand_idx = 0
 
+        #LOAD SAVE
+        try:
+            self.Load_game('Data/Saves/save.json')
+        except FileNotFoundError:
+            if not os.path.exists('Data/Saves'):
+                os.makedirs('Data/Saves')
+            if not os.path.exists('Data/Saves/save.json'):
+                f = open('Data/Saves/save.json', 'w')
+                json.dump({'level': 0, 'pistol': 50, 'rifle': 100, 'launcher': 0, 'health': self.Player.Max_Health}, f)
+                f.close()
+            self.Load_game('Data/Saves/save.json')
+        
+        dest = 'Data/Maps/' + str(level) + '.json'
+        try:
+            self.tilemap.Load(dest)
+        except FileNotFoundError:
+            pass
+        
         # Leaf Particles
         self.Leaf_spawner = []
         for tree in self.tilemap.extract([('large_decor', 2)], True):
@@ -55,16 +78,7 @@ class Game:
         for ply in self.tilemap.extract([('Spawner', 0)], keep=False):
             self.Player.pos[0] = ply['pos'][0]
             self.Player.pos[1] = ply['pos'][1]
-        
-        #DROPS
-        self.Drops = []
-        
-        #WEAPONS
-        self.hands.append(Launcher((15, 15), self.Player.pos, (58, 20), self.Projectile, scale= 0.2, offsetR=(10, 15), offsetL=(8, 35)))
-        self.hands.append(Rifle((15, 15), self.Player.pos, (30, 15), self.Projectile, scale= 1.2, offsetR=(20, 25), offsetL=(2, 50)))
-        self.hands.append(Pistol((15, 15), self.Player.pos, (10, 15), self.Projectile, scale= 1.2, offsetR=(30, 25), offsetL=(5, 30)))
-        self.hand_idx = 0
-        
+
         #ENEMIES
         self.enemies = []
         # self.enemies = [Thug(self, 'Thug', (500,0), (24,54), self.assets, scale= 2.5, animations_offset=(-35, -9))]
@@ -105,19 +119,25 @@ class Game:
         self.End = False
         self.name_move_flag = False
         self.name_offset_move = 1
+        self.Main_menu_BG = random.choices(['Paralax_1', 'Paralax_2', 'Paralax_3'])
+        self.Main_menu = self.assets[self.Main_menu_BG[0]].copy()
 
     def run(self):
         if self.state == "Main_Menu":
             res = self.Butt_Play.update()
             if res:
                 self.state = res
+
             res = self.Butt_Exit.update()
             if res:
                 self.state = res
+            
+            res = self.Butt_Reset.update()
+            if res:
+                self.state = res
 
-            self.assets['Paralax_1'].update()
-            bg = self.assets['Paralax_1'].IMG()
-            display.blit(pygame.transform.scale(bg, (screen_w, screen_h)), (0, 0))
+            self.Main_menu.update()
+            display.blit(pygame.transform.scale(self.Main_menu.IMG(), (screen_w, screen_h)), (0, 0))
 
             name = self.assets['Name']
             name_rect = name.get_rect(center = (screen_w/2, 150 + self.name_offset_move))
@@ -138,6 +158,11 @@ class Game:
 
             self.Butt_Play.render(display)
             self.Butt_Exit.render(display)
+            self.Butt_Reset.render(display)
+        
+        elif self.state == "Reset":
+            os.remove('Data/Saves/save.json')
+            self.End = True
 
         elif self.state == "Play":
             pygame.display.set_caption(str(pygame.time.Clock.get_fps(clock)))
@@ -296,7 +321,6 @@ class Game:
                         self.Particles.remove(Particle)
             
             self.render_UI()
-            self.cursor_render()
             if len(self.Boss):
                 self.Boss_health_name(display, self.target)
 
@@ -312,20 +336,47 @@ class Game:
                 trans_surf.set_colorkey("white")
                 display.blit(trans_surf, (0, 0))
             
+            Pause_surf.blit(display, (0, 0))
+            
             # WIN_CONDITION
             if len(self.enemies) == 0 and len(self.Boss) == 0:
                 if not self.End:
                     global level
                     level = min(level + 1, max_level)
+                    self.Save_game('Data/Saves/save.json', level)
                     self.End = True
 
             if self.Player.Dead:
+                f = open('Data/Saves/save.json', 'r')
+                map_data = json.load(f)
+                f.close()
+
+                f = open('Data/Saves/save.json', 'w')
+                json.dump({'level': level, 'pistol': map_data['pistol'], 'rifle': map_data['rifle'], 'launcher': map_data['launcher'], 'health': self.Player.Max_Health}, f)
+                f.close()
                 self.End = True
 
         elif self.state == "Quit":
             pygame.quit()
             sys.exit()
     
+    def Save_game(self, path, level):
+        f = open(path, 'w')
+        json.dump({'level': level, 'pistol': self.hands[0].ammo, 'rifle': self.hands[1].ammo, 'launcher': self.hands[2].ammo, 'health': self.Player.Health}, f)
+        f.close()
+
+    def Load_game(self, path):
+        global level
+        f = open(path, 'r')
+        map_data = json.load(f)
+        f.close()
+        self.hands[0].ammo = map_data['pistol']
+        self.hands[1].ammo = map_data['rifle']
+        self.hands[2].ammo = map_data['launcher']
+        self.Player.Health = map_data['health']
+        level = map_data['level']
+
+
     def cursor_render(self):
         pygame.mouse.set_visible(False)
         mouse_pos = pygame.mouse.get_pos()
@@ -362,7 +413,7 @@ class Game:
         elif health_ration*100 < 60:
              pygame.draw.rect(healthbar, 'yellow', (0, 0, healthbar_width, 32), border_radius= 10)
         else:
-            pygame.draw.rect(healthbar, 'green', (0, 0, healthbar_width, 32), border_radius= 10)
+            pygame.draw.rect(healthbar, 'chartreuse2', (0, 0, healthbar_width, 32), border_radius= 10)
         display.blit(healthbar, healthbar_rect)
 
         #AMMO
@@ -381,7 +432,7 @@ class Game:
         Dash_rect = Dash_surf.get_rect(topleft = ammo_rect.topright)
         Dash_status = self.Player.dash_ava
         if Dash_status:
-            dash_text = BIG_FONT.render("Dash", True, "green")
+            dash_text = BIG_FONT.render("Dash", True, "chartreuse2")
         else:
             dash_text = BIG_FONT.render("Dash", True, "grey")
         dash_text_rect = dash_text.get_rect(center = (Dash_rect.centerx, Dash_rect.centery + 3))
@@ -393,7 +444,7 @@ class Game:
         if Health_bar_width < 0:
             Health_bar_width = 0
         Health_bar_surf = pygame.Surface((Health_bar_width, 25))
-        Health_bar_surf.fill('green')
+        Health_bar_surf.fill('chartreuse2')
         Health_bar_rect = Health_bar_surf.get_rect(midbottom = (screen_w/2 , screen_h - 10))
         text = BIG_FONT.render(boss.name, True, "red")
         text_rect = text.get_rect(midbottom = Health_bar_rect.midtop)
@@ -403,24 +454,32 @@ class Game:
 
 if __name__ == '__main__':
     pygame.init()
+    MEGA_FONT = pygame.font.Font("Data/Pixeltype.ttf", 80)
     BIG_FONT = pygame.font.Font("Data/Pixeltype.ttf", 40)
     SML_FONT = pygame.font.Font("Data/Pixeltype.ttf", 20)
     screen = pygame.display.set_mode((screen_w, screen_h))
     display = pygame.surface.Surface((screen_w, screen_h))
+    Pause_surf = pygame.surface.Surface((screen_w, screen_h))
     clock = pygame.time.Clock()
     max_level = len(os.listdir('Data/Maps')) - 1
     level = 0
     click = False
+    Pause = False
 
     FPS = 60  # FRAMERATE LIMITER
     game = Game()
 
     while True:
         clock.tick(FPS)
+        state = game.state
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    if state == 'Play':
+                        Pause = not Pause
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if game.state == 'Play':
                     if event.button == 1:
@@ -437,7 +496,24 @@ if __name__ == '__main__':
             game = Game()
             game.state = 'Play'
 
-        game.run()
+        if state == 'Play':
+            if not Pause:
+                game.run()
+                game.cursor_render()
+            else:
+                display.blit(Pause_surf, (0, 0))
+
+                black_overlay = pygame.Surface((screen_w, screen_h))
+                black_overlay.fill('black')
+                black_overlay.set_alpha(100)
+                display.blit(black_overlay, (0, 0))
+
+                text = MEGA_FONT.render('PAUSE', True, 'white')
+                display.blit(text, (screen_w/2 - text.get_width()/2, screen_h/2))
+                game.cursor_render()
+        else:
+            game.run()
+
         screen.blit(pygame.transform.scale(
             display, (screen_w, screen_h)), (0, 0))
         pygame.display.flip()
