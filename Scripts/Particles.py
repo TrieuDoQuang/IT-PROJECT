@@ -1,6 +1,7 @@
 from Scripts.Assets import *
 import random, math, copy
 
+pygame.mixer.init()
 class Leaf:
     def __init__(self, assets, pos, velocity=[0, 0], frame=0, scale = 2):
         self.assets = assets
@@ -358,6 +359,9 @@ class Earth_Cols:
         self.parts = []
         self.done = False
         self.hit = False
+        earthsfx = pygame.mixer.Sound('Data/sfx/Earth.wav')
+        earthsfx.set_volume(0.1)
+        earthsfx.play()
     
     def update(self):
         if self.count <= self.amounts:
@@ -374,7 +378,7 @@ class Earth_Cols:
             if not self.hit:
                 if i.rect().colliderect(self.game.Player.rect()):
                     if not self.game.Player.is_dash:
-                        self.game.Player.DMG(100)
+                        self.game.Player.DMG(40)
                         self.game.Particles.append(Blood_explode(self.game, self.game.Player.rect().center, 5, 0.05, 15))
                     self.hit = True
     
@@ -425,7 +429,7 @@ class Dark_spell:
         if self.rect().colliderect(self.game.Player.rect()):
             if now - self.hit_frame >= self.hit_delay:
                 if not self.game.Player.is_dash:
-                    self.game.Player.DMG(10)
+                    self.game.Player.DMG(20)
                     self.game.Particles.append(Blood_explode(self.game, self.game.Player.rect().center, 5, 0.05, 15))
                 self.hit_frame = pygame.time.get_ticks()
     
@@ -454,6 +458,9 @@ class Laser_line:
         self.offset = offset
         self.done = False
         self.hit = False
+        lasersfx = pygame.mixer.Sound('Data/sfx/laser.wav')
+        lasersfx.set_volume(0.1)
+        lasersfx.play()
     
     def update(self):
             width = 32 * self.count
@@ -465,7 +472,7 @@ class Laser_line:
 
             if not self.hit:
                 if self.rect2.colliderect(self.game.Player.rect()):
-                    self.game.Player.DMG(100)
+                    self.game.Player.DMG(80)
                     self.game.Particles.append(Blood_explode(self.game, self.game.Player.rect().center, 5, 0.05, 15))
                     self.hit = True
 

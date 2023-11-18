@@ -5,14 +5,16 @@ from Scripts.Drops import BossDropHandler
 from Scripts.Projectile import Soul_bullet, FireBall
 from Scripts.Particles import *
 
-# hit_sound = pygame.mixer.Sound('data/sfx/hit.wav')
-# hit_sound.set_volume(0.2)
+hit_sound_ene = pygame.mixer.Sound('Data/sfx/hit.wav')
+hit_sound_ene.set_volume(0.2)
 
 # Dash_sound = pygame.mixer.Sound('data/sfx/dash.wav')
 # Dash_sound.set_volume(0.1)
 
 # Fire_sound = pygame.mixer.Sound('data/sfx/fire.mp3')
 # Fire_sound.set_volume(0.3)
+
+pygame.mixer.init()
 
 class Boss:
     def __init__(self, game, pos, type, name, size, Health = 10000, dmg = 50, scale = 1, anim_offset=(0,0)):
@@ -154,7 +156,7 @@ class Boss:
         return pygame.Rect(self.pos, self.size)
 
 class Evil_wizard(Boss):
-    def __init__(self, game, pos, name, size, Health = 8000, scale = 3, anim_offset = (0, 0)):
+    def __init__(self, game, pos, name, size, Health = 2500, scale = 3, anim_offset = (0, 0)):
         super().__init__(game, pos, 'Evil', name, size, Health, scale=scale, anim_offset=anim_offset)
         self.attack_delay = 2000
         self.attack_frame = 0
@@ -163,6 +165,12 @@ class Evil_wizard(Boss):
         self.Burn_frame = 0
 
         self.size_bck = self.size[0]
+
+        self.Fire_sound = pygame.mixer.Sound('Data/sfx/fire.mp3')
+        self.Fire_sound.set_volume(0.1)
+        self.Dash_sond = pygame.mixer.Sound('Data/sfx/dash.wav')
+        self.Dash_sond.set_volume(0.1)
+
     def rect(self):
         if self.action == 'attack1':
             if self.flip:
@@ -182,15 +190,16 @@ class Evil_wizard(Boss):
         if self.rect().colliderect(self.game.Player.rect()):
             if self.action == 'attack1':
                 if self.now - self.Burn_frame >= self.Burn_delay:
-                    # hit_sound.play()
+                    hit_sound_ene.play()
                     if not self.game.Player.is_dash:
                         self.game.Player.DMG(3)
                     self.Burn_frame = pygame.time.get_ticks()
             elif self.action == 'hit' or self.action == 'death':
-                pass
+                self.Fire_sound.stop()
             else:
+                self.Fire_sound.stop()
                 if self.now -self.attack_frame >= self.Player_invs:
-                    # hit_sound.play()
+                    hit_sound_ene.play()
                     self.attack_frame = pygame.time.get_ticks()
                     if not self.game.Player.is_dash:
                         self.game.Player.DMG(self.dmg)
@@ -211,15 +220,15 @@ class Evil_wizard(Boss):
                 if chance <= 50:
                     self.attack_frame = pygame.time.get_ticks()
                     self.set_action('attack1')
-                    # Dash_sound.play()
-                    # Fire_sound.play()
+                    self.Dash_sond.play()
+                    self.Fire_sound.play(loops=1)
                     #X AXIS
                     self.Dest[0] = self.game.Player.pos[0]
                     #Y AXIS
                     self.Dest[1] = self.game.Player.pos[1] - 20
                 elif chance <= 85:
                     self.set_action('move')
-                    # Dash_sound.play()
+                    self.Dash_sond.play()
                     #X AXIS
                     if self.pos[0] + 200 >= self.bound[0]:
                         self.Dest[0] = self.pos[0] + random.randrange(-200, -50, 10)
@@ -247,7 +256,7 @@ class Evil_wizard(Boss):
                         self.Dest[1] = self.pos[1] + step
 
 class Ghost(Boss):
-    def __init__(self, game, pos, name, size, Health = 8000, scale = 3, anim_offset = (0, 0)):
+    def __init__(self, game, pos, name, size, Health = 2500, scale = 3, anim_offset = (0, 0)):
         super().__init__(game, pos, 'Ghost', name, size, Health, scale=scale, anim_offset=anim_offset)
         self.attack_delay = 2000
         self.attack_frame = 0
@@ -267,7 +276,7 @@ class Ghost(Boss):
         if self.action == 'hit':
             if self.charging:
                 self.charging = False
-                self.game.Projectile.append(Soul_bullet(self.game, (self.rect().centerx, self.rect().centery -10 ), -1 if self.flip else 1, 8, (40, 30), 0, scale=2, offset= (-60, -80) if not self.flip else (-80, -80), showtime=100))
+                self.game.Projectile.append(Soul_bullet(self.game, (self.rect().centerx, self.rect().centery -10 ), -1 if self.flip else 1, 8, (40, 30), 0, scale=2, offset= (-60, -80) if not self.flip else (-80, -80), showtime=100, dame=10))
         
         if self.rect().colliderect(self.game.Player.rect()):
             if self.action == 'hit' or self.action == 'death':
@@ -283,7 +292,7 @@ class Ghost(Boss):
             if self.action == 'attack1':
                 if self.charging:
                     if self.now - self.Soul_ball_frame >= self.Soul_ball_delay:
-                        self.game.Projectile.append(Soul_bullet(self.game, (self.rect().centerx, self.rect().centery -30 ), -1 if self.flip else 1, 8, (70, 60), 0, scale=4, offset=(-140, -160) if not self.flip else (-160, -160), showtime=100))
+                        self.game.Projectile.append(Soul_bullet(self.game, (self.rect().centerx, self.rect().centery -30 ), -1 if self.flip else 1, 8, (70, 60), 0, scale=4, offset=(-140, -160) if not self.flip else (-160, -160), showtime=100, dame=40))
                         self.Soul_ball_frame = pygame.time.get_ticks()
                         self.charging = False
                 if self.Dir.x == 0 and self.Dir.y == 0:
@@ -343,7 +352,7 @@ class Ghost(Boss):
                         self.Dest[1] = self.pos[1] + step
 
 class Groudon(Boss):
-    def __init__(self, game, pos, name, size, Health=15000, dmg=50, scale=1, anim_offset=(0, 0)):
+    def __init__(self, game, pos, name, size, Health=3500, dmg=50, scale=1, anim_offset=(0, 0)):
         super().__init__(game, pos, 'Groudon', name, size, Health, dmg, scale, anim_offset)
         self.attack_delay = 1000
         self.attack_frame = 0
@@ -427,7 +436,7 @@ class Groudon(Boss):
                 if self.action == 'attack3':
                     if self.now - self.fire_ball_frame >= self.fire_ball_delay:
                         self.fire_ball_frame = pygame.time.get_ticks()
-                        self.game.Projectile.append(FireBall(self.game, (self.rect().centerx, self.rect().centery -70 ), 1 if self.flip else -1, 8, (130, 120), 0, scale=4, offset=(-140, -160), showtime=100))
+                        self.game.Projectile.append(FireBall(self.game, (self.rect().centerx, self.rect().centery -70 ), 1 if self.flip else -1, 8, (130, 120), 0, scale=4, offset=(-140, -160), showtime=100, dame=20))
 
                 if self.animation.done:
                     self.set_action('idle')
@@ -467,7 +476,7 @@ class Groudon(Boss):
             surf.blit(pygame.transform.flip(Overlay, self.flip, False), (self.pos[0] - offset[0] + self.anim_offset[0], self.pos[1] - offset[1] + self.anim_offset[1]))
 
 class Death(Boss):
-    def __init__(self, game, pos, name, size, Health=10000, dmg=50, scale=1, anim_offsetL=(0, 0), anim_offseR=(0, 0) ):
+    def __init__(self, game, pos, name, size, Health=3000, dmg=50, scale=1, anim_offsetL=(0, 0), anim_offseR=(0, 0) ):
         super().__init__(game, pos, 'Death', name, size, Health, dmg, scale, anim_offsetL)
         self.anim_offsetL = list(anim_offsetL)
         self.anim_offsetR = list(anim_offseR)

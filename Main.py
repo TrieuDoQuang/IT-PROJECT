@@ -123,6 +123,15 @@ class Game:
         self.Main_menu_BG = random.choice(['Paralax_1', 'Paralax_2', 'Paralax_3'])
         self.Main_menu = self.assets[self.Main_menu_BG].copy()
 
+        #SFX
+        pygame.mixer.init()
+        self.expsfx = pygame.mixer.Sound('Data/sfx/explosion.mp3')
+        self.expsfx.set_volume(0.1)
+
+        self.ambiencesfx = pygame.mixer.Sound('Data/sfx/ambience.wav')
+        self.ambiencesfx.set_volume(0.1)
+        self.ambiencesfx.play(1)
+
     def run(self):
         if self.state == "Main_Menu":
             res = self.Butt_Play.update()
@@ -213,8 +222,13 @@ class Game:
                         else:
                             self.explosion.append(Explosion(i.rect().center, (200, 200), i.dame, 'Ene'))
                         self.Particles.append(Smoke_explode(self, i.rect().center, 4, 0.5, 20))
+                    else:
+                        hit = pygame.mixer.Sound('Data/sfx/hit.wav')
+                        hit.set_volume(0.5)
+                        hit.play()
                     self.Particles.append(Dirt_Splater(self, 10, i.rect(), -1 if i.flip else 1, 10, 0.3, 8))
                     i.kill[0] = True
+                    i.update()
                     self.Projectile.remove(i)
                     continue
                 else:
@@ -222,12 +236,16 @@ class Game:
                         # print("before",self.hands[self.hand_idx].ammo, self.hands[self.hand_idx].type)
                         for ene in self.enemies.copy():
                             if ene.rect().colliderect(i.rect()):
+                                hit = pygame.mixer.Sound('Data/sfx/hit.wav')
+                                hit.set_volume(0.6)
+                                hit.play()
                                 ene.DMG(i.dame)
                                 if i.explosion:
                                     self.explosion.append(Explosion(i.pos, (200, 200), i.dame, 'Player'))
                                     self.Particles.append(Smoke_explode(self, i.rect().center, 4, 0.5, 20))
                                 self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 10, 0.05, 3 ))
                                 i.kill[0] = True
+                                i.update()
                                 self.Projectile.remove(i)
                                 break
                         for boss in self.Boss.copy():
@@ -240,10 +258,14 @@ class Game:
                                     boss.Recover_frame = pygame.time.get_ticks()
                                     boss.Hurt = True
                                     boss.flash_frame = pygame.time.get_ticks()
+                                    hit = pygame.mixer.Sound('Data/sfx/hit.wav')
+                                    hit.set_volume(0.6)
+                                    hit.play()
                                     boss.DMG(i.dame)
                                     BossDropHandler(self, list(i.rect().center))
                                     self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 6, 0.05, 3))
                                     i.kill[0] = True
+                                    i.update()
                     else:
                         if self.Player.rect().colliderect(i.rect()):
                             if i.explosion:
@@ -256,6 +278,7 @@ class Game:
                                 self.Particles.append(Shock_waves(i.rect().center, 30, 'white', 5, amounts= 1))
                                 self.Particles.append(Sparks(i.rect().center, 5, (255, 247, 180), 5, 60))
                             i.kill[0] = True
+                            i.update()
                             self.Projectile.remove(i)
                             continue
             
@@ -278,7 +301,7 @@ class Game:
                 i.render(display, offset=render_scroll)
                 if self.Player.rect().colliderect(i.rect()):
                     if self.Player.is_dash:
-                        i.DMG(100)
+                        i.DMG(20)
                         self.Particles.append(Shock_waves(i.rect().center, 30, 'white', 5, amounts= 1))
                         self.Particles.append(Blood_spill(self, i.rect().center, (-1 if self.Player.Vel.x < 0 else 1, 0), 6, 0.05, 3))
                         self.Particles.append(Sparks(i.rect().center, 5, (255, 247, 180), 5, 60))
@@ -314,6 +337,7 @@ class Game:
                 # i.render(display, render_scroll)
                 self.Particles.append(Shock_waves(i.rect().center, 30, 'white', 5, amounts= 2))
                 self.explosion.remove(i)
+                self.expsfx.play()
             
             # PARTICLES HANDLER FRONT
             for Particle in sorted(self.Particles.copy(), key= lambda x: x.amounts):

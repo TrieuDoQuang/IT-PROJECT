@@ -2,6 +2,17 @@ import pygame, math, copy
 from Scripts.Assets import Assets
 from Scripts.Projectile import *
 
+pygame.mixer.init()
+pistolsfx = pygame.mixer.Sound('Data/sfx/pistol.mp3')
+pistolsfx.set_volume(0.1)
+
+riflesfx = pygame.mixer.Sound('Data/sfx/rifle.mp3')
+riflesfx.set_volume(0.1)
+
+launchersfx = pygame.mixer.Sound('Data/sfx/launcher.mp3')
+launchersfx.set_volume(0.1)
+
+
 class Weapon:
     def __init__(self, type, size, pos, pivot, projectile, dame = 100, scale = 1, offsetL = (0,0), offsetR = (0,0), delay = 500, ammo = 50):
         self.type = type
@@ -89,13 +100,14 @@ class Pistol(Weapon):
             if not game.Player.is_dash and not game.Player.Wall_slide:
                 current = pygame.time.get_ticks()
                 if current - self.timer >= self.delay:
+                    pistolsfx.play(maxtime= self.delay)
                     self.set_action('shoot')
                     self.projectile.append(Small_ammo(game, (game.Player.rect().centerx ,game.Player.rect().centery - 15), self.flip, 8, (15, 10), self.angle, dame = self.dame, showtime= 100))
                     self.ammo -= 1
                     self.timer = pygame.time.get_ticks()
 
 class Rifle(Weapon):
-    def __init__(self, size, pos, pivot, projectile,  dame = 20, scale=1, offsetL=(0, 0), offsetR=(0, 0), delay= 400, ammo=50):
+    def __init__(self, size, pos, pivot, projectile,  dame = 25, scale=1, offsetL=(0, 0), offsetR=(0, 0), delay= 400, ammo=50):
         super().__init__('rifle', size, pos, pivot, projectile, dame, scale, offsetL, offsetR, delay, ammo)
     
     def update(self, offset, player):
@@ -108,13 +120,14 @@ class Rifle(Weapon):
             if not game.Player.is_dash and not game.Player.Wall_slide:
                 current = pygame.time.get_ticks()
                 if current - self.timer >= self.delay:
+                    riflesfx.play(maxtime=self.delay)
                     self.set_action('shoot')
                     self.projectile.append(Small_ammo(game, (game.Player.rect().centerx,game.Player.rect().centery - 10 ), self.flip, 8, (15, 10), self.angle, dame = self.dame, showtime= 150))
                     self.ammo -= 1
                     self.timer = pygame.time.get_ticks()
 
 class Launcher(Weapon):
-    def __init__(self, size, pos, pivot, projectile,  dame = 500, scale=1, offsetL=(0, 0), offsetR=(0, 0), delay= 1500, ammo=50):
+    def __init__(self, size, pos, pivot, projectile,  dame = 250, scale=1, offsetL=(0, 0), offsetR=(0, 0), delay= 1500, ammo=50):
         super().__init__('launcher', size, pos, pivot, projectile, dame, scale, offsetL, offsetR, delay, ammo)
     
     def update(self, offset, player):
@@ -127,6 +140,7 @@ class Launcher(Weapon):
             if not game.Player.is_dash and not game.Player.Wall_slide:
                 current = pygame.time.get_ticks()
                 if current - self.timer >= self.delay:
+                    launchersfx.play(maxtime=self.delay)
                     self.set_action('shoot')
                     self.projectile.append(Rocket_ammo(game, (game.Player.rect().centerx - 5,game.Player.rect().centery - 10), self.flip, 8, (20, 12), self.angle, dame = self.dame, showtime= 120, scale=0.4))
                     self.ammo -= 1
@@ -143,6 +157,9 @@ class Wep_Ene:
         self.dame = dame
         self.delay = delay
         self.timer = pygame.time.get_ticks()
+        self.eneriflesfx = pygame.mixer.Sound('Data/sfx/rifle.mp3')
+        self.eneriflesfx.set_volume(0.1)
+
     
     def set_action(self, action):
         if action != self.action:
@@ -152,6 +169,7 @@ class Wep_Ene:
     def attack(self, game, ene):
         current = pygame.time.get_ticks()
         if current - self.timer >= self.delay:
+            self.eneriflesfx.play(maxtime=self.delay)
             self.timer = pygame.time.get_ticks()
             self.set_action('shoot')
             game.Projectile.append(Small_Ene_ammo(game, (ene.rect().centerx, ene.rect().centery), -1 if ene.flip else 1, 8, (15, 10), 0, dame = self.dame, showtime= 100))

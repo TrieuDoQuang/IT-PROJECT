@@ -2,6 +2,8 @@ import pygame, math, copy
 from Scripts.Assets import Assets
 from Scripts.Particles import Smoke_Trail
 
+pygame.mixer.init()
+
 class Projectile:
     def __init__(self, game, type, pos, vel, speed, size, angle, owner = 'player', dame = 10, showtime = 250, scale = 1, explosion = False):
         self.type = type
@@ -79,10 +81,15 @@ class FireBall(Projectile):
         super().__init__(game,'fireball', pos, vel, speed, size, angle, owner, dame, showtime, scale, explosion)
         self.animation = self.game.assets['bullet/' + self.type].copy()
         self.offset = offset
+        self.firesfx = pygame.mixer.Sound('Data/sfx/fire.mp3')
+        self.firesfx.set_volume(0.1)
+        self.firesfx.play(loops=1)
     
     def update(self):
         super().update()
         self.animation.update()
+        if self.kill[0] == True:
+            self.firesfx.stop()
     
     def render(self, surf, offset=(0, 0)):
         if self.current_time - self.timer >= self.showtime:

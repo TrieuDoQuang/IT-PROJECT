@@ -209,7 +209,7 @@ class Wizard(PhysicsEntity):
             if self.action != 'attack':
                 self.timer = pygame.time.get_ticks()
             if current - self.timer >= self.delay:
-                self.game.Projectile.append(FireBall(self.game, self.rect().center, -1 if self.flip else 1, 8, (20,15), 0, scale= 1.5, showtime=80, offset=(-75, -75)))
+                self.game.Projectile.append(FireBall(self.game, self.rect().center, -1 if self.flip else 1, 8, (20,15), 0, scale= 1.5, showtime=80, offset=(-75, -75), dame=25))
                 self.timer = pygame.time.get_ticks()
 
     def update(self, tilemap, player):
@@ -268,14 +268,14 @@ class Wizard(PhysicsEntity):
         surf.blit(pygame.transform.flip(img, self.flip, False),(self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
 
 class Zombie(PhysicsEntity):
-    def __init__(self, game, e_type, pos, size, assets, Health = 150, speed=1.5, scale = 1, animations_offset=(0, 0)):
+    def __init__(self, game, e_type, pos, size, assets, Health = 200, speed=1.5, scale = 1, animations_offset=(0, 0)):
         super().__init__(e_type, pos, size, assets, Health, speed)
         self.scale = scale
         self.animations_offset = animations_offset
         self.walking = 0
         self.Air_time = 0
         self.game = game
-        self.weapon = Wep_Ene('rifle', Loffset=(100, 10), Roffset=(15, 10), scale=1)
+        self.weapon = Wep_Ene('rifle', Loffset=(100, 10), Roffset=(15, 10), scale=1, dame=20)
 
     def walk(self, tilemap):
         if not self.walking:
