@@ -89,6 +89,7 @@ class Boss:
                         self.flash_frame = pygame.time.get_ticks()
                         self.game.Particles.append(Blood_explode(self.game, self.rect().center, 5, 0.05, 15))
                         self.game.Particles.append(Shock_waves(self.rect().center, 30, 'white', 5, amounts= 2))
+                        self.game.Particles.append(Sparks(self.rect().center, 5, (255, 247, 180), 5, 60))
                         # for i in range(100):
                         #     angle = random.random() * math.pi * 2
                         #     Pvel = [ math.cos(angle) * 1, math.sin(angle) * 1]
@@ -494,7 +495,7 @@ class Death(Boss):
     
     def update(self):
         if self.action == "attack1":
-            self.size[0] = self.size_bck + 130
+            self.size[0] = self.size_bck + 160
         else:
             self.size[0] = self.size_bck
 

@@ -641,3 +641,148 @@ class Shock_waves:
     def render(self, surf, offset):
         for i in self.parts:
             i.render(surf, offset)
+
+class Spark:
+    def __init__(self, pos, color, size, angle, speed):
+        self.pos = pos
+        self.size = size
+        self.angle = angle
+        self.speed = speed
+        self.color = color
+        self.done = False
+    
+    def update(self):
+        self.pos[0] += math.cos(self.angle) * self.speed
+        self.pos[1] += math.sin(self.angle) * self.speed
+        self.speed = max(0, self.speed -0.05)
+        if self.speed == 0:
+            self.done = True
+    
+    def render(self, surf, offset):
+        render_points = [
+            (self.pos[0] + math.cos(self.angle) * self.speed * self.size - offset[0], self.pos[1] + math.sin(self.angle) *self.speed * self.size -offset[1] ),
+            (self.pos[0] + math.cos(self.angle + math.pi * 0.5) * self.speed * self.size//2 - offset[0], self.pos[1] + math.sin(self.angle + math.pi * 0.5) *self.speed * self.size//2 - offset[1] ),
+            (self.pos[0] + math.cos(self.angle + math.pi) * self.speed * self.size - offset[0], self.pos[1] + math.sin(self.angle + math.pi) * self.speed * self.size -offset[1] ),
+            (self.pos[0] + math.cos(self.angle - math.pi * 0.5) * self.speed * self.size//2 - offset[0], self.pos[1] + math.sin(self.angle - math.pi * 0.5) *self.speed * self.size//2 -offset[1] ),
+        ]
+        pygame.draw.polygon(surf, self.color, render_points)
+
+class Sparks:
+    def __init__(self, pos, size, color, speed, amounts, angle = 0):
+        self.type = 'Sparks'
+        self.pos = list(pos)
+        self.size = size
+        self.color = color
+        self.speed = speed
+        self.amounts = amounts
+        self.angle = angle
+        self.done = False
+        self.count = 0
+        self.parts = []
+    
+    def update(self):
+        while self.count <= 30:
+            speed = random.random() * self.speed
+            if self.angle == 0:
+                 angle = random.random() * math.pi * 2
+            else:
+                angle = self.angle
+            pos = copy.deepcopy(self.pos)
+            self.parts.append(Spark(pos, self.color, self.size, angle, speed))
+            self.count += 1
+            if self.count == 31:
+                pos = copy.deepcopy(self.pos)
+                self.parts.append(Spark(pos, self.color, self.size, 0, speed + 2))
+                pos = copy.deepcopy(self.pos)
+                self.parts.append(Spark(pos, self.color, self.size, math.pi, speed + 2))
+        
+        for part in self.parts.copy():
+            part.update()
+            if part.done:
+                self.parts.remove(part)
+        
+        count2 = len(self.parts)
+        if count2 == 0:
+            self.done = True
+            return True
+        return False
+    
+    def render(self, surf, offset):
+        for i in self.parts:
+            i.render(surf, offset)
+
+class SpeedLine:
+    def __init__(self, pos, size, color, vel, speed):
+        self.pos = pos
+        self.size = size
+        self.vel = vel
+        self.speed = speed
+        self.color = color
+        self.done = False
+    
+    def update(self):
+        self.pos[0] += self.vel * self.speed
+        self.speed = max(0, self.speed - 0.1)
+        if self.speed == 0:
+            self.done = True
+
+    def render(self, surf, offset):
+        render_points = [
+            (self.pos[0] + math.cos(0) * self.speed * self.size - offset[0], self.pos[1] + math.sin(0) *self.speed * self.size -offset[1] ),
+            (self.pos[0] + math.cos(0 + math.pi * 0.5) * 2 - offset[0], self.pos[1] + math.sin(0 + math.pi * 0.5) * 2 - offset[1] ),
+            (self.pos[0] + math.cos(0 + math.pi) * self.speed * self.size - offset[0], self.pos[1] + math.sin(0 + math.pi) * self.speed * self.size -offset[1] ),
+            (self.pos[0] + math.cos(0 - math.pi * 0.5) * 2 - offset[0], self.pos[1] + math.sin(0 - math.pi * 0.5) * 2 -offset[1] ),
+        ]
+        pygame.draw.polygon(surf, self.color, render_points)
+
+class SpeedLines:
+    def __init__(self, pos, size, rect_size, color, speed, vel, amounts):
+        self.type = 'blood'
+        self.pos = pos
+        self.size = size
+        self.rect_size = rect_size
+        self.color = color
+        self.speed = speed
+        self.amounts = amounts
+        self.vel = vel
+        self.done = False
+        self.count = 0
+        self.parts = []
+
+    def update(self):
+        if self.count <= self.amounts:
+
+            pos = copy.deepcopy(self.pos)
+            pos[0] += self.rect_size[0]//2
+            pos[1] += random.randint(0, self.rect_size[1])
+            size = random.random() * self.size
+            speed = random.random() * self.speed + 1
+            if self.color == 'speed':
+                color = random.choice(['grey', 'white'])
+            else:
+                color = self.color
+            self.parts.append(SpeedLine(pos, size, color, self.vel, speed))
+            
+            # pos = copy.deepcopy(self.pos)
+            # pos[1] += random.randint(0, 64)
+            # size = random.random() * self.size
+            # speed = random.random() * self.speed + 1
+            # self.parts.append(SpeedLine(pos, size, self.color, self.vel, speed))
+
+            self.count += 1
+        
+        for part in self.parts.copy():
+            part.update()
+            if part.done:
+                self.parts.remove(part)
+        
+        count2 =  len(self.parts)
+        if count2 == 0:
+            self.done = True
+            return True
+        return False
+    
+    def render(self, surf, offset):
+        for i in self.parts:
+            i.render(surf, offset)
+    

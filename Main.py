@@ -120,8 +120,8 @@ class Game:
         self.End = False
         self.name_move_flag = False
         self.name_offset_move = 1
-        self.Main_menu_BG = random.choices(['Paralax_1', 'Paralax_2', 'Paralax_3'])
-        self.Main_menu = self.assets[self.Main_menu_BG[0]].copy()
+        self.Main_menu_BG = random.choice(['Paralax_1', 'Paralax_2', 'Paralax_3'])
+        self.Main_menu = self.assets[self.Main_menu_BG].copy()
 
     def run(self):
         if self.state == "Main_Menu":
@@ -254,6 +254,7 @@ class Game:
                                 self.Particles.append(Blood_explode(self, self.Player.rect().center, 6, 0.05, 20))
                             else:
                                 self.Particles.append(Shock_waves(i.rect().center, 30, 'white', 5, amounts= 1))
+                                self.Particles.append(Sparks(i.rect().center, 5, (255, 247, 180), 5, 60))
                             i.kill[0] = True
                             self.Projectile.remove(i)
                             continue
@@ -280,6 +281,7 @@ class Game:
                         i.DMG(100)
                         self.Particles.append(Shock_waves(i.rect().center, 30, 'white', 5, amounts= 1))
                         self.Particles.append(Blood_spill(self, i.rect().center, (-1 if self.Player.Vel.x < 0 else 1, 0), 6, 0.05, 3))
+                        self.Particles.append(Sparks(i.rect().center, 5, (255, 247, 180), 5, 60))
                 if i.Dead:
                     self.enemies.remove(i)
                     self.Particles.append(Blood_explode(self, i.pos, 5, 0.05, 15))

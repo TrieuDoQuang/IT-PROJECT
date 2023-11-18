@@ -1,6 +1,6 @@
 import pygame, math
 from Scripts.Entities import PhysicsEntity
-from Scripts.Particles import Dirt_Splater
+from Scripts.Particles import Dirt_Splater, SpeedLines
 
 class Player(PhysicsEntity):
     def __init__(self, game, e_type, pos, size, assets, Health = 400, speed = 2, size_mul = 1, animoffset = (-3, -3)):
@@ -81,6 +81,7 @@ class Player(PhysicsEntity):
                     self.dash_timer = pygame.time.get_ticks()
                     self.Vel.x = 5
                     self.is_dash = True
+                self.game.Particles.append(SpeedLines(self.pos, 10, self.size, 'speed', 5, 1 if self.flip else -1, 30))
 
     def stop(self):
         if self.Air_time < 4:
