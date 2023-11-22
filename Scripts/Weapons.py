@@ -3,8 +3,6 @@ from Scripts.Assets import Assets
 from Scripts.Projectile import *
 
 pygame.mixer.init()
-pistolsfx = pygame.mixer.Sound('Data/sfx/pistol.mp3')
-pistolsfx.set_volume(0.1)
 
 riflesfx = pygame.mixer.Sound('Data/sfx/rifle.mp3')
 riflesfx.set_volume(0.1)
@@ -100,6 +98,8 @@ class Pistol(Weapon):
             if not game.Player.is_dash and not game.Player.Wall_slide:
                 current = pygame.time.get_ticks()
                 if current - self.timer >= self.delay:
+                    pistolsfx = pygame.mixer.Sound('Data/sfx/pistol.mp3')
+                    pistolsfx.set_volume(0.1)
                     pistolsfx.play(maxtime= self.delay)
                     self.set_action('shoot')
                     self.projectile.append(Small_ammo(game, (game.Player.rect().centerx ,game.Player.rect().centery - 15), self.flip, 8, (15, 10), self.angle, dame = self.dame, showtime= 100))

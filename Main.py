@@ -7,6 +7,7 @@ from Scripts.Clouds import Clouds
 from Scripts.Player import Player
 from Scripts.Assets import *
 from Scripts.Tilemap import Tilemap
+from Scripts.Cats import *
 from Scripts.Particles import *
 from Scripts.Enemies import *
 from Scripts.Weapons import *
@@ -45,8 +46,8 @@ class Game:
         self.Drops = []
         
         #WEAPONS
-        self.hands.append(Pistol((15, 15), self.Player.pos, (10, 15), self.Projectile, scale= 1.2, offsetR=(30, 25), offsetL=(5, 30)))
         self.hands.append(Rifle((15, 15), self.Player.pos, (30, 15), self.Projectile, scale= 1.2, offsetR=(20, 25), offsetL=(2, 50)))
+        self.hands.append(Pistol((15, 15), self.Player.pos, (10, 15), self.Projectile, scale= 1.2, offsetR=(30, 25), offsetL=(5, 30)))
         self.hands.append(Launcher((15, 15), self.Player.pos, (58, 20), self.Projectile, scale= 0.2, offsetR=(10, 15), offsetL=(8, 35)))
         self.hand_idx = 0
 
@@ -115,6 +116,23 @@ class Game:
             self.Boss.append(Death(self, (boss['pos'][0], boss['pos'][1]), "Bringer of Death", (90, 155), anim_offsetL=(-165, -30), anim_offseR=(-30, -30), scale=2))
         if len(self.Boss):
             self.target = self.Boss[0]
+        
+        #CATS
+        self.cats = []
+        for cat in self.tilemap.extract([('Cats', 0)], keep= False):
+            self.cats.append(Cat(self, 'Black', (cat['pos'][0], cat['pos'][1]), (80, 45), self.assets, scale= 3, animations_offset=(-40, -50)))
+
+        for cat in self.tilemap.extract([('Cats', 1)], keep= False):
+            self.cats.append(Cat(self, 'Grey', (cat['pos'][0], cat['pos'][1]), (80, 45), self.assets, scale= 3, animations_offset=(-40, -50)))
+
+        for cat in self.tilemap.extract([('Cats', 2)], keep= False):
+            self.cats.append(Cat(self, 'Orange', (cat['pos'][0], cat['pos'][1]), (80, 45), self.assets, scale= 3, animations_offset=(-40, -50)))
+        
+        for cat in self.tilemap.extract([('Cats', 3)], keep= False):
+            self.cats.append(Cat(self, 'Stray', (cat['pos'][0], cat['pos'][1]), (80, 45), self.assets, scale= 3, animations_offset=(-40, -50)))
+        
+        for cat in self.tilemap.extract([('Cats', 4)], keep= False):
+            self.cats.append(Cat(self, 'White', (cat['pos'][0], cat['pos'][1]), (80, 45), self.assets, scale= 3, animations_offset=(-40, -50)))
 
         #LEVEL HANDLER
         self.End = False
@@ -126,11 +144,11 @@ class Game:
         #SFX
         pygame.mixer.init()
         self.expsfx = pygame.mixer.Sound('Data/sfx/explosion.mp3')
-        self.expsfx.set_volume(0.1)
+        self.expsfx.set_volume(0.3)
 
         self.ambiencesfx = pygame.mixer.Sound('Data/sfx/ambience.wav')
-        self.ambiencesfx.set_volume(0.1)
-        self.ambiencesfx.play(1)
+        self.ambiencesfx.set_volume(0.3)
+        self.ambiencesfx.play(loops=-1)
 
     def run(self):
         if self.state == "Main_Menu":
@@ -311,6 +329,11 @@ class Game:
                     # print("before",self.hands[self.hand_idx].ammo, self.hands[self.hand_idx].type)
                     DropHandler(self, i.pos)
             
+            #CATS HANDLER
+            for i in self.cats:
+                i.update(self.tilemap)
+                i.render(display, offset=render_scroll)
+            
             # BOSS HANDLER
             for boss in self.Boss.copy():
                 boss.update()
@@ -366,7 +389,7 @@ class Game:
             Pause_surf.blit(display, (0, 0))
             
             # WIN_CONDITION
-            if len(self.enemies) == 0 and len(self.Boss) == 0:
+            if len(self.enemies) == 0 and len(self.Boss) == 0 and len(self.cats) == 0:
                 if not self.End:
                     global level
                     level = min(level + 1, max_level)
@@ -389,7 +412,7 @@ class Game:
     
     def Save_game(self, path, level):
         f = open(path, 'w')
-        json.dump({'level': level, 'pistol': self.hands[0].ammo, 'rifle': self.hands[1].ammo, 'launcher': self.hands[2].ammo, 'health': self.Player.Health}, f)
+        json.dump({'level': level, 'pistol': self.hands[1].ammo, 'rifle': self.hands[0].ammo, 'launcher': self.hands[2].ammo, 'health': self.Player.Health}, f)
         f.close()
 
     def Load_game(self, path):
@@ -397,8 +420,8 @@ class Game:
         f = open(path, 'r')
         map_data = json.load(f)
         f.close()
-        self.hands[0].ammo = map_data['pistol']
-        self.hands[1].ammo = map_data['rifle']
+        self.hands[0].ammo = map_data['rifle']
+        self.hands[1].ammo = map_data['pistol']
         self.hands[2].ammo = map_data['launcher']
         self.Player.Health = map_data['health']
         level = map_data['level']

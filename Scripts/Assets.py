@@ -26,6 +26,7 @@ Assets = {
     'grass2': [Load_IMGS('tiles/grass2'), 2],
     'decor': [Load_IMGS('tiles/decor'), 2],
     'large_decor': [Load_IMGS('tiles/large_decor'), 3],
+    'wall': [Load_IMGS('tiles/wall'), 1],
     
     # Particles
     'Particles/leaf': Animation(Load_IMGS('particles/leaf'), dur=15, loop=False),
@@ -127,4 +128,50 @@ Assets = {
     'Death/death' : Animation(Load_IMGS('entities/boss3/death'), dur=10, loop=False),
     'Death/attack1' : Animation(Load_IMGS('entities/boss3/attack'), dur=8, loop= False),
     'Death/attack2' : Animation(Load_IMGS('entities/boss3/attack2'), dur=10, loop= False),
+
+    #CATS
+    #ORANGE
+    'Orange/idle': Animation(Load_IMGS('entities/cats/orange/idle'), dur=8),
+    'Orange/laying': Animation(Load_IMGS('entities/cats/orange/laying'), dur=8, loop=False),
+    'Orange/wakeup': Animation(Load_IMGS('entities/cats/orange/wakeup'), dur=8, loop=False),
+    'Orange/sitting': Animation(Load_IMGS('entities/cats/orange/sitting'), dur=8, loop=False),
+    'Orange/licking': Animation(Load_IMGS('entities/cats/orange/licking'), dur=8),
+    'Orange/stretch': Animation(Load_IMGS('entities/cats/orange/stretch'), dur=8, loop=False),
+    'Orange/walking': Animation(Load_IMGS('entities/cats/orange/walking'), dur=8),
+
+    #BLACK
+    'Black/idle': Animation(Load_IMGS('entities/cats/black/idle'), dur=8),
+    'Black/laying': Animation(Load_IMGS('entities/cats/black/laying'), dur=8, loop=False),
+    'Black/wakeup': Animation(Load_IMGS('entities/cats/black/wakeup'), dur=8, loop=False),
+    'Black/sitting': Animation(Load_IMGS('entities/cats/black/sitting'), dur=8, loop=False),
+    'Black/licking': Animation(Load_IMGS('entities/cats/black/licking'), dur=8),
+    'Black/stretch': Animation(Load_IMGS('entities/cats/black/stretch'), dur=8, loop=False),
+    'Black/walking': Animation(Load_IMGS('entities/cats/black/walking'), dur=8),
+
+    #WHITE
+    'White/idle': Animation(Load_IMGS('entities/cats/white/idle'), dur=8),
+    'White/laying': Animation(Load_IMGS('entities/cats/white/laying'), dur=8, loop=False),
+    'White/wakeup': Animation(Load_IMGS('entities/cats/white/wakeup'), dur=8, loop=False),
+    'White/sitting': Animation(Load_IMGS('entities/cats/white/sitting'), dur=8, loop=False),
+    'White/licking': Animation(Load_IMGS('entities/cats/white/licking'), dur=8),
+    'White/stretch': Animation(Load_IMGS('entities/cats/white/stretch'), dur=8, loop=False),
+    'White/walking': Animation(Load_IMGS('entities/cats/white/walking'), dur=8),
+
+    #STRAY
+    'Stray/idle': Animation(Load_IMGS('entities/cats/stray/idle'), dur=8),
+    'Stray/laying': Animation(Load_IMGS('entities/cats/stray/laying'), dur=8, loop=False),
+    'Stray/wakeup': Animation(Load_IMGS('entities/cats/stray/wakeup'), dur=8, loop=False),
+    'Stray/sitting': Animation(Load_IMGS('entities/cats/stray/sitting'), dur=8, loop=False),
+    'Stray/licking': Animation(Load_IMGS('entities/cats/stray/licking'), dur=8),
+    'Stray/stretch': Animation(Load_IMGS('entities/cats/stray/stretch'), dur=8, loop=False),
+    'Stray/walking': Animation(Load_IMGS('entities/cats/stray/walking'), dur=8),
+
+    #GREY
+    'Grey/idle': Animation(Load_IMGS('entities/cats/grey/idle'), dur=8),
+    'Grey/laying': Animation(Load_IMGS('entities/cats/grey/laying'), dur=8, loop=False),
+    'Grey/wakeup': Animation(Load_IMGS('entities/cats/grey/wakeup'), dur=8, loop=False),
+    'Grey/sitting': Animation(Load_IMGS('entities/cats/grey/sitting'), dur=8, loop=False),
+    'Grey/licking': Animation(Load_IMGS('entities/cats/grey/licking'), dur=8),
+    'Grey/stretch': Animation(Load_IMGS('entities/cats/grey/stretch'), dur=8, loop=False),
+    'Grey/walking': Animation(Load_IMGS('entities/cats/grey/walking'), dur=8),
 }

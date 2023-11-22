@@ -1,66 +1,121 @@
 import pygame, random
 from Scripts.Entities import *
 
-class Zombie(PhysicsEntity):
+pygame.mixer.init()
+class Cat(PhysicsEntity):
     def __init__(self, game, e_type, pos, size, assets, Health = 150, speed=1.5, scale = 1, animations_offset=(0, 0)):
         super().__init__(e_type, pos, size, assets, Health, speed)
         self.scale = scale
         self.animations_offset = animations_offset
-        self.walking = 0
-        self.Air_time = 0
         self.game = game
-        self.weapon = Wep_Ene('rifle', Loffset=(100, 10), Roffset=(15, 10), scale=1)
+
+        self.walking = 0
+        self.laying = 0
+        self.licking = 0
+        self.strecthing = 0
+
+        self.timer = pygame.time.get_ticks()
+        self.delay = 1000
+
+        self.meow1 = pygame.mixer.Sound('Data/sfx/moew1.mp3')
+        self.meow1.set_volume(0.5)
+        self.meow2 = pygame.mixer.Sound('Data/sfx/moew2.mp3')
+        self.meow2.set_volume(0.1)
+
+        self.air_time = 0
+    
+    def DMG(self, dmg):
+        pass
 
     def walk(self, tilemap):
+        self.set_action('walking')
         if not self.walking:
-            self.walking = random.randint(30, 120)
+            self.walking = random.randint(50, 200)
         if tilemap.solid_check((self.pos[0], self.pos[1]), self.size, self.flip):
             if self.Coll['left'] or self.Coll['right']:
                 self.flip = not self.flip
         else:
             self.flip = not self.flip
-        self.Dir.x = (-1 if self.flip else 1)
+        if self.air_time <= 4:
+            self.Dir.x = (-1 if self.flip else 1)
     
-    def attack(self):
-        self.weapon.attack(self.game, self)
-        self.walking = 0
+    def lay(self):
+        self.set_action('laying')
+        if not self.laying:
+            self.laying = random.randint(300, 500)
+    
+    def lick(self):
+        self.set_action('licking')
+        if not self.licking:
+            self.laying = random.randint(300, 400)
+    
+    def stretch(self):
+        self.set_action('stretch')
+        if not self.strecthing:
+            self.strecthing = random.randint(100, 150)
+    
+    def move(self, tilemap):
+        chance = random.randint(0, 100)
+        if chance < 10:
+            self.lay()
+        elif chance < 20:
+            self.set_action('sitting')
+        elif chance < 30:
+            self.walk(tilemap)
+        
+        if chance < 20:
+            choice = random.choice(['moew1', 'meow2'])
+            if choice == 'moew1':
+                self.meow1.play()
+            elif choice == 'meow2':
+                self.meow2.play()
 
-    def update(self, tilemap, player):
+    def update(self, tilemap):
         super().update(tilemap)
-        self.Air_time += 1
+        self.air_time += 1
         if self.Coll['bottom']:
-            self.Air_time = 0
+            self.air_time = 0
 
-        # self.dbg = tilemap.solid_check(
-        #     (self.pos[0], self.pos[1]), self.size, self.flip)
+        now = pygame.time.get_ticks()
 
-        self.walking = max(0, self.walking - 1)
-        if self.walking == 0:
+        if self.action == 'idle':
+            if now - self.timer >= self.delay:
+                self.move(tilemap)
+                self.timer = pygame.time.get_ticks()
+
+        if self.action == 'sitting':
+            if self.animation.done:
+                choice =  random.choice(['lick', 'stretch'])
+                if choice == 'lick':
+                    self.lick()
+                elif choice == 'stretch':
+                    self.stretch()
+
+        self.walking = max(self.walking - 1, 0)
+        self.laying = max(self.laying - 1, 0)
+        self.licking = max(self.licking - 1, 0)
+        self.strecthing = max(self.strecthing - 1, 0)
+
+        if self.walking != 0:
+            self.walk(tilemap)
+        else:
             self.Dir.x = 0
-        else:
-            if self.Air_time < 1:
-                self.walk(tilemap)
 
-        if abs(player.rect().x - self.rect().x) <= 224:
-            if self.rect().bottom - player.rect().bottom  < 64 and self.rect().bottom - player.rect().bottom >= 0:
-                if self.rect().x - player.rect().x > 0:
-                    self.flip = True
-                if self.rect().x - player.rect().x < 0:
-                    self.flip = False
-                self.attack()
-        self.weapon.update(self.rect(), self.flip)
-
-        if self.action == 'idle' and self.Air_time < 1 and self.weapon.action == 'idle':
-            chance = random.randint(0, 100)
-            if chance < 10:
-                self.walk(tilemap)
-
-        if self.Dir.x != 0:
-            self.set_action('run')
-        else:
-            self.set_action('idle')
-
+        if self.Dir.x == 0:
+            if self.walking == 0 and self.laying == 0 and self.licking == 0 and self.strecthing == 0:
+                if self.action == 'laying':
+                    self.set_action('wakeup')
+                elif self.action == 'wakeup':
+                    if self.animation.done:
+                        self.set_action('idle')
+                elif self.action == 'sitting':
+                    pass
+                else:
+                    self.set_action('idle')
+    
     def render(self, surf, offset=(0, 0)):
+        # rect = pygame.Surface((self.rect().width, self.rect().height))
+        # surf.blit(rect, (self.rect().x - offset[0], self.rect().y - offset[1]))
+
         img = pygame.transform.scale(self.animation.IMG(), (self.animation.IMG().get_width() * self.scale, self.animation.IMG().get_height() * self.scale))
         surf.blit(pygame.transform.flip(img, self.flip, False),(self.pos[0] - offset[0] + self.animations_offset[0], self.pos[1] - offset[1] + self.animations_offset[1]))
-        self.weapon.render(surf, self.flip, offset)
