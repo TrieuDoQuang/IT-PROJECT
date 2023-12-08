@@ -1,6 +1,6 @@
 import pygame
 import time
-import sys
+import sys, os
 
 from Scripts.Utils import Load_IMG
 from Scripts.Utils import Load_IMGS
@@ -31,13 +31,22 @@ class Editor():
         self.Tile_group = 0
         self.Tile_variant = 0
 
+        self.list_songs = os.listdir('Data/songs')
+        self.song_idx = 0
+        self.song = 'Data/songs/' + self.list_songs[self.song_idx]
+        self.song_preview = pygame.mixer.Sound(self.song)
+        self.song_preview.set_volume(0.5)
+        self.Tilemap.song = self.song
+       
+        self.font = pygame.font.Font('Data/Pixeltype.ttf', 30)
+
         try:
             self.Tilemap.Load('map.json')
         except FileNotFoundError:
             pass
+        print('current song: ' + self.Tilemap.song)
 
     def Run(self):
-
         self.scroll[0] += (Movement[1] - Movement[0]) * 5
         self.scroll[1] += (Movement[3] - Movement[2]) * 5
 
@@ -86,9 +95,13 @@ class Editor():
         render_scroll = (int(self.scroll[0]), int(self.scroll[1])) 
         self.Tilemap.render(Display, offset = render_scroll)
 
+        song_text = self.font.render(self.song, True, 'White')
+        Display.blit(song_text, (0, screen_h - 30))
+
 
 if __name__ == '__main__':
     pygame.init()
+    pygame.mixer.init()
     screen_w = 1280
     screen_h = 736
     screen = pygame.display.set_mode((screen_w, screen_h))
@@ -167,6 +180,21 @@ if __name__ == '__main__':
                     editor.Tilemap.save('map.json')
                 if event.key == pygame.K_t:
                     editor.Tilemap.AutoTile()
+                if event.key == pygame.K_1:
+                    editor.song_idx = (editor.song_idx - 1) % len(editor.list_songs)
+                    editor.song = 'Data/songs/' + editor.list_songs[editor.song_idx]
+                    editor.Tilemap.song = editor.song
+                    editor.song_preview.stop()
+                if event.key == pygame.K_2:
+                    editor.song_idx = (editor.song_idx + 1) % len(editor.list_songs)
+                    editor.song = 'Data/songs/' + editor.list_songs[editor.song_idx]
+                    editor.Tilemap.song = editor.song
+                    editor.song_preview.stop()
+                if event.key == pygame.K_p:
+                    editor.song_preview.stop()
+                    editor.song_preview = pygame.mixer.Sound(editor.song)
+                    editor.song_preview.set_volume(0.5)
+                    editor.song_preview.play(-1)
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_w:

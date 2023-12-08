@@ -360,7 +360,7 @@ class Earth_Cols:
         self.done = False
         self.hit = False
         earthsfx = pygame.mixer.Sound('Data/sfx/Earth.wav')
-        earthsfx.set_volume(0.1)
+        earthsfx.set_volume(0.4)
         earthsfx.play()
     
     def update(self):
@@ -407,6 +407,8 @@ class Dark_spell:
         self.hit_frame = 0
         self.hit_delay = 800
         self.speed = 7
+
+        self.lightning_timer = 0
         
     def set_action(self, action):
         if action != self.action:
@@ -425,7 +427,12 @@ class Dark_spell:
         self.size[1] += self.speed
         self.speed = max(self.speed - 0.5, 0.5)
 
-        
+        if now - self.lightning_timer >= self.hit_delay:
+                lightning_sound = pygame.mixer.Sound('Data/sfx/lightning.mp3')
+                lightning_sound.set_volume(0.5)
+                lightning_sound.play(maxtime=self.hit_delay)
+                self.lightning_timer = pygame.time.get_ticks()
+
         if self.rect().colliderect(self.game.Player.rect()):
             if now - self.hit_frame >= self.hit_delay:
                 if not self.game.Player.is_dash:

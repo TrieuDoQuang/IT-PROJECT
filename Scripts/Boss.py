@@ -64,6 +64,7 @@ class Boss:
         self.Hurt = False 
         self.flash_frame = 0
         self.flash_delay = 100
+        self.hit_sound = pygame.mixer.Sound('Data/sfx/hit.wav')
     
     def DMG(self, health):
         self.health -= health
@@ -86,6 +87,7 @@ class Boss:
                             self.set_action('hit')
                         self.hurt_frame = pygame.time.get_ticks()
                         self.Recover_frame = pygame.time.get_ticks()
+                        self.hit_sound.play()
                         self.DMG(100)
                         self.Hurt = True
                         self.flash_frame = pygame.time.get_ticks()
@@ -269,6 +271,11 @@ class Ghost(Boss):
         self.bound[3] = self.pos[1] - 350
 
         self.charging = False
+        self.swoosh = pygame.mixer.Sound('Data/sfx/dark_dash.mp3')
+        self.swoosh.set_volume(0.3)
+
+        self.att_sound = pygame.mixer.Sound('Data/sfx/dark_casting.mp3')
+        self.att_sound.set_volume(0.3)
     
     def update(self):
         super().update()
@@ -309,6 +316,7 @@ class Ghost(Boss):
                 if chance <= 50:
                     self.attack_frame = pygame.time.get_ticks()
                     self.set_action('attack1')
+                    self.att_sound.play(maxtime=1500)
                     self.charging = True
                     # Dash_sound.play()
                     # Fire_sound.play()
@@ -324,6 +332,7 @@ class Ghost(Boss):
 
                 elif chance <= 85:
                     self.set_action('move')
+                    self.swoosh.play()
                     # Dash_sound.play()
                     #X AXIS
                     if self.pos[0] + 200 >= self.bound[0]:
@@ -365,6 +374,11 @@ class Groudon(Boss):
 
         self.fire_ball_frame = 0
         self.fire_ball_delay = 1200
+
+        self.hit_sound = pygame.mixer.Sound('Data/sfx/metallic_clang.mp3')
+        self.hit_sound.set_volume(0.3)
+        self.swoosh = pygame.mixer.Sound('Data/sfx/swoosh.wav')
+        self.swoosh.set_volume(1)
 
     def rect(self):
         if self.action == 'attack2' or self.action == 'attack1':
@@ -413,7 +427,6 @@ class Groudon(Boss):
         if self.rect().colliderect(self.game.Player.rect()):
             if "attack" in self.action:
                 if self.now - self.attack_frame >= self.Player_invs:
-                    # hit_sound.play()
                     self.attack_frame = pygame.time.get_ticks()
                     if not self.game.Player.is_dash:
                         self.game.Player.DMG(self.dmg)
@@ -446,6 +459,7 @@ class Groudon(Boss):
         if self.action == 'idle':
             if abs(self.rect().centerx - self.game.Player.rect().centerx) <= 150:
                 attacks = random.choice(['attack1', 'attack2'])
+                self.swoosh.play(maxtime=300)
                 self.set_action(attacks)
                 self.attack_frame = pygame.time.get_ticks()
             elif now - self.cool_frame >= self.cool_down:
@@ -492,6 +506,9 @@ class Death(Boss):
 
         self.Spell_frame = 0
         self.Spell_delay = 1200
+
+        self.swoosh = pygame.mixer.Sound('Data/sfx/swoosh.wav')
+        self.swoosh.set_volume(1)
 
     def rect(self):
         if self.action == "attack1":
@@ -578,6 +595,7 @@ class Death(Boss):
         if self.action == 'idle':
             if abs(self.rect().centerx - self.game.Player.rect().centerx) <= 150:
                 self.set_action('attack1')
+                self.swoosh.play(maxtime=300)
                 self.attack_frame = pygame.time.get_ticks()
             if now - self.cool_frame >= self.cool_down:
                 self.cool_frame = pygame.time.get_ticks()

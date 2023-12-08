@@ -150,8 +150,20 @@ class Game:
         self.ambiencesfx.set_volume(0.3)
         self.ambiencesfx.play(loops=-1)
 
+        #SONGS
+        self.map_song = pygame.mixer.Sound(self.tilemap.song)
+        self.map_song.set_volume(0.4)
+        self.map_song_play = True
+        self.main_menu_song = pygame.mixer.Sound('Data/songs/menu.mp3')
+        self.main_menu_song.set_volume(0.5)
+        self.main_menu_song_play = True
+
     def run(self):
         if self.state == "Main_Menu":
+            if self.main_menu_song_play:
+                self.main_menu_song.play(-1)
+                self.main_menu_song_play = False
+
             res = self.Butt_Play.update()
             if res:
                 self.state = res
@@ -190,9 +202,15 @@ class Game:
         
         elif self.state == "Reset":
             os.remove('Data/Saves/save.json')
+            self.main_menu_song.stop()
             self.End = True
 
         elif self.state == "Play":
+            if self.map_song_play:
+                self.main_menu_song.stop()
+                self.map_song.play(-1)
+                self.map_song_play = False
+
             pygame.display.set_caption(str(pygame.time.Clock.get_fps(clock)))
 
             # BACK_GROUND
@@ -276,9 +294,8 @@ class Game:
                                     boss.Recover_frame = pygame.time.get_ticks()
                                     boss.Hurt = True
                                     boss.flash_frame = pygame.time.get_ticks()
-                                    hit = pygame.mixer.Sound('Data/sfx/hit.wav')
-                                    hit.set_volume(0.6)
-                                    hit.play()
+                                    boss.hit_sound.set_volume(0.6)
+                                    boss.hit_sound.play()
                                     boss.DMG(i.dame)
                                     BossDropHandler(self, list(i.rect().center))
                                     self.Particles.append(Blood_spill(self, i.rect().center, i.dir, 6, 0.05, 3))
@@ -553,6 +570,7 @@ if __name__ == '__main__':
                 # PAUSE MENU
                 resp = game.Butt_Main_Menu.update()
                 if resp == 'Menu':
+                    game.map_song.stop()
                     game = Game()
                     pygame.mouse.set_visible(True)
                     Pause = False

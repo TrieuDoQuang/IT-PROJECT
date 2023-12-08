@@ -82,7 +82,7 @@ class FireBall(Projectile):
         self.animation = self.game.assets['bullet/' + self.type].copy()
         self.offset = offset
         self.firesfx = pygame.mixer.Sound('Data/sfx/fire.mp3')
-        self.firesfx.set_volume(0.1)
+        self.firesfx.set_volume(0.3)
         self.firesfx.play(loops=1)
     
     def update(self):

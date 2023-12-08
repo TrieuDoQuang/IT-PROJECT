@@ -25,6 +25,7 @@ class Tilemap:
     def __init__(self, game, tile_size=32):
         self.game = game
         self.tile_size = tile_size
+        self.song = ''
         self.tilemap = {}
         self.offgrid_map = {}
 
@@ -118,13 +119,14 @@ class Tilemap:
 
     def save(self, path):
         f = open(path, 'w')
-        json.dump({'tilemap': self.tilemap, 'tile_size': self.tile_size, 'offgrid': self.offgrid_map}, f)
+        json.dump({'song': self.song, 'tilemap': self.tilemap, 'tile_size': self.tile_size, 'offgrid': self.offgrid_map}, f)
         f.close()
 
     def Load(self, path):
         f = open(path, 'r')
         map_data = json.load(f)
         f.close()
+        self.song = map_data['song']
         self.tilemap = map_data['tilemap']
         self.tile_size = map_data['tile_size']
         self.offgrid_map = map_data['offgrid']

@@ -4,6 +4,9 @@ from Scripts.Particles import Earth_Cols, Laser_line
 from Scripts.Projectile import FireBall
 import pygame, random
 
+pygame.mixer.init()
+pygame.mixer.set_num_channels(8)
+
 class Skeleton(PhysicsEntity):
     def __init__(self, game, e_type, pos, size, assets, Health = 250, speed=1.5, scale = 1, animations_offset=(0, 0)):
         super().__init__(e_type, pos, size, assets, Health, speed)
@@ -15,6 +18,11 @@ class Skeleton(PhysicsEntity):
         self.attacking = False
         self.delay = 900
         self.timer = pygame.time.get_ticks()
+
+        self.sound_att = pygame.mixer.Sound('Data/sfx/skeleton.mp3')
+        self.sound_timer = pygame.time.get_ticks()
+        self.sound_delay = 1000
+        self.sound_att.set_volume(0.3)
 
     def walk(self, tilemap):
         if not self.walking:
@@ -57,6 +65,11 @@ class Skeleton(PhysicsEntity):
                 self.walk(tilemap)
 
         if abs(player.rect().x - self.rect().x) < 150:
+            if random.randint(0, 100) < 20:
+                if pygame.time.get_ticks() - self.sound_timer >= self.sound_delay:
+                    self.sound_att.play()
+                    self.sound_timer = pygame.time.get_ticks()
+
             if self.rect().bottom - player.rect().bottom  < 64 and self.rect().bottom - player.rect().bottom >= 0:
                 if self.rect().x - player.rect().x > 0:
                     self.flip = True
@@ -137,7 +150,7 @@ class Thug(PhysicsEntity):
 
         if self.action != 'attack':
             if abs(player.rect().x - self.rect().x) < 324:
-                 if self.rect().bottom - player.rect().bottom  < 64 and self.rect().bottom - player.rect().bottom >= 0:
+                if self.rect().bottom - player.rect().bottom  < 64 and self.rect().bottom - player.rect().bottom >= 0:
                     if self.rect().x - player.rect().x > 0:
                         self.flip = True
                     if self.rect().x - player.rect().x < 0:
@@ -186,6 +199,8 @@ class Wizard(PhysicsEntity):
         self.delay = 1000
         self.timer = pygame.time.get_ticks()
         self.attacking = False
+        self.att_sound = pygame.mixer.Sound('Data/sfx/magic_spell.mp3')
+        self.att_sound.set_volume(0.25)
 
     def walk(self, tilemap):
         if not self.walking:
@@ -201,6 +216,7 @@ class Wizard(PhysicsEntity):
         self.walking = 0
         self.attacking = True
         self.fireball()
+        self.att_sound.play(maxtime=800)
         self.set_action('attack')
     
     def fireball(self):
@@ -276,6 +292,10 @@ class Zombie(PhysicsEntity):
         self.Air_time = 0
         self.game = game
         self.weapon = Wep_Ene('rifle', Loffset=(100, 10), Roffset=(15, 10), scale=1, dame=20)
+        self.sound_att = pygame.mixer.Sound('Data/sfx/zombie_growl.mp3')
+        self.sound_timer = pygame.time.get_ticks()
+        self.sound_delay = 3000
+        self.sound_att.set_volume(0.1)
 
     def walk(self, tilemap):
         if not self.walking:
@@ -308,6 +328,10 @@ class Zombie(PhysicsEntity):
                 self.walk(tilemap)
 
         if abs(player.rect().x - self.rect().x) <= 224:
+            if random.randint(0, 100) < 20:
+                if pygame.time.get_ticks() - self.sound_timer >= self.sound_delay:
+                    self.sound_timer = pygame.time.get_ticks()
+                    self.sound_att.play()
             if self.rect().bottom - player.rect().bottom  < 64 and self.rect().bottom - player.rect().bottom >= 0:
                 if self.rect().x - player.rect().x > 0:
                     self.flip = True

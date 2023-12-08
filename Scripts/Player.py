@@ -2,6 +2,7 @@ import pygame, math
 from Scripts.Entities import PhysicsEntity
 from Scripts.Particles import Dirt_Splater, SpeedLines
 
+pygame.mixer.init()
 class Player(PhysicsEntity):
     def __init__(self, game, e_type, pos, size, assets, Health = 400, speed = 2, size_mul = 1, animoffset = (-3, -3)):
         super().__init__(e_type, pos, size, assets, Health, speed= speed)
@@ -27,7 +28,16 @@ class Player(PhysicsEntity):
         self.spark_delay = 0
 
         self.dash_ava = True
+
+        self.hurt_sound = pygame.mixer.Sound('Data/sfx/ough.mp3')
+        self.hurt_sound.set_volume(0.3)
+        self.dash_sound = pygame.mixer.Sound('Data/sfx/swoosh.wav')
+        self.dash_sound.set_volume(1)
     
+    def DMG(self, dmg):
+        self.hurt_sound.play()
+        super().DMG(dmg)
+
     def Movement(self, offset):
         keys = pygame.key.get_pressed()
         mouse_pos = pygame.mouse.get_pos()
@@ -73,6 +83,7 @@ class Player(PhysicsEntity):
         current_time = pygame.time.get_ticks()
         if current_time - self.dash_timer >= self.dash_delay:
             if not self.Wall_slide:
+                self.dash_sound.play()
                 if self.flip:
                     self.dash_timer = pygame.time.get_ticks()
                     self.Vel.x = -5
