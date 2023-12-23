@@ -411,10 +411,12 @@ class Game:
                     global level
                     level = min(level + 1, max_level)
                     self.Save_game('Data/Saves/save.json', level)
+                    self.map_song.stop()
                     self.End = True
 
             if self.Player.Dead:
                 f = open('Data/Saves/save.json', 'r')
+                self.map_song.stop()
                 map_data = json.load(f)
                 f.close()
 
